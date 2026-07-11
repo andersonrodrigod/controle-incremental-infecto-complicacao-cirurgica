@@ -66,10 +66,17 @@ def obter_caminho_arquivo(
 
 def obter_caminho_log() -> Path:
     configuracoes = carregar_configuracoes()
-    configuracao_log = configuracoes["logs"]
+    pastas = configuracoes["pastas"]
+    arquivos = configuracoes["arquivos"]
+
+    if "logs" not in pastas:
+        raise KeyError("Pasta nao configurada: logs")
+
+    if "log" not in arquivos:
+        raise KeyError("Arquivo nao configurado: log")
 
     return (
         RAIZ_PROJETO
-        / configuracao_log["pasta"]
-        / configuracao_log["arquivo"]
+        / pastas["logs"]
+        / arquivos["log"]["nome"]
     )

@@ -1,10 +1,17 @@
+import logging
+
+from core.logging_config import configurar_logging
 from services.pipeline import executar_pipeline
 
 
 def main() -> None:
-    print("Iniciando controle incremental...")
+    configurar_logging()
+    logger = logging.getLogger(__name__)
+
+    logger.info("Iniciando controle incremental...")
     executar_pipeline()
-    print("Execução finalizada.")
+    logger.info("Execucao finalizada.")
+
 
 if __name__ == "__main__":
     main()

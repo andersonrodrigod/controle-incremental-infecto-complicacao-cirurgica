@@ -1,7 +1,10 @@
+import logging
+
 import pandas as pd
 
-from core.caminhos import obter_caminho_arquivo
+from core.caminhos import obter_caminho_arquivo, obter_caminho_pasta
 from core.config import carregar_configuracoes
+from services.backup import criar_backup_arquivo, gerar_timestamp_backup
 from services.historico import identificar_registros_novos
 from services.leitura import ler_excel
 from services.processamento import (
@@ -17,8 +20,11 @@ from services.validacao import (
 from services.escrita import salvar_excel
 
 
+logger = logging.getLogger(__name__)
+
+
 def executar_pipeline() -> None:
-    print("Iniciando execução...")
+    logger.info("Iniciando execucao do pipeline...")
 
     # 1. Carregamento das configurações
     configuracoes = carregar_configuracoes()
@@ -35,6 +41,7 @@ def executar_pipeline() -> None:
     caminho_entrada = obter_caminho_arquivo("entrada")
     caminho_destino_p1 = obter_caminho_arquivo("destino_p1")
     caminho_destino_rp1 = obter_caminho_arquivo("destino_rp1")
+    caminho_backups = obter_caminho_pasta("backups")
 
     # 3. Leitura da entrada
     dados = ler_excel(
@@ -133,35 +140,29 @@ def executar_pipeline() -> None:
     )
 
     # 11. Resumo da execução
-    print(f"Arquivo lido: {caminho_entrada.name}")
-    print(f"Aba lida: {configuracao_entrada['aba']}")
-    print(f"Linhas lidas: {dados.shape[0]}")
-    print(f"Colunas lidas: {dados.shape[1]}")
+    logger.info("Arquivo lido: %s", caminho_entrada.name)
+    logger.info("Aba lida: %s", configuracao_entrada["aba"])
+    logger.info("Linhas lidas: %s", dados.shape[0])
+    logger.info("Colunas lidas: %s", dados.shape[1])
 
-    print(
-        f"Registros selecionados para P1: "
-        f"{dados_p1.shape[0]}"
+    logger.info(
+        "Registros selecionados para P1: %s",
+        dados_p1.shape[0]
     )
 
-    print(
-        f"Novos registros para P1: "
-        f"{novos_p1.shape[0]}"
+    logger.info(
+        "Novos registros para P1: %s",
+        novos_p1.shape[0]
     )
 
-    print(
-        f"Registros selecionados para RP1: "
-        f"{dados_rp1.shape[0]}"
+    logger.info(
+        "Registros selecionados para RP1: %s",
+        dados_rp1.shape[0]
     )
 
-    print(
-        f"Novos registros para RP1: "
-        f"{novos_rp1.shape[0]}"
-    )
-
-    print(
-    dados_rp1[
-        ["SENHA", "COD USUARIO", "RP1 Nº"]
-    ].to_string(index=False)
+    logger.info(
+        "Novos registros para RP1: %s",
+        novos_rp1.shape[0]
     )
 
     dados_finais_p1 = pd.concat(
@@ -182,6 +183,26 @@ def executar_pipeline() -> None:
         columns=configuracoes["renomear_colunas"]["rp1"]
     )
 
+    timestamp_backup = gerar_timestamp_backup()
+
+    backup_p1 = criar_backup_arquivo(
+        caminho_origem=caminho_destino_p1,
+        pasta_backups=caminho_backups,
+        timestamp=timestamp_backup
+    )
+
+    backup_rp1 = criar_backup_arquivo(
+        caminho_origem=caminho_destino_rp1,
+        pasta_backups=caminho_backups,
+        timestamp=timestamp_backup
+    )
+
+    if backup_p1 is not None:
+        logger.info("Backup P1 criado: %s", backup_p1.name)
+
+    if backup_rp1 is not None:
+        logger.info("Backup RP1 criado: %s", backup_rp1.name)
+
     salvar_excel(
         dados=dados_finais_p1,
         caminho_destino=caminho_destino_p1,
@@ -194,5 +215,5 @@ def executar_pipeline() -> None:
         nome_aba=configuracao_destino_rp1["aba"]
     )
 
-    print("Processamento incremental concluído.")
-    print("Execução finalizada.")
+    logger.info("Processamento incremental concluido.")
+    logger.info("Execucao do pipeline finalizada.")
