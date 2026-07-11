@@ -1,0 +1,238 @@
+Anotações de Aprendizado – Estrutura do Projeto
+
+1. Path (pathlib.Path)
+
+Path representa caminhos de arquivos e pastas como objetos Python.
+
+Exemplo:
+
+    from pathlib import Path
+
+    caminho = Path("C:/Projeto") / "config" / "configuracoes.json"
+
+O operador / não divide. Quando usado com Path, ele junta partes do
+caminho.
+
+Resultado:
+
+    C:/Projeto/config/configuracoes.json
+
+Vantagens
+
+-   Funciona no Windows, Linux e macOS.
+-   Evita concatenar strings manualmente.
+-   Possui vários métodos úteis (exists(), is_file(), mkdir(), etc.).
+
+------------------------------------------------------------------------
+
+2. Por que usar parênteses
+
+Exemplo:
+
+    CAMINHO_CONFIGURACOES = (
+        RAIZ_PROJETO
+        / "config"
+        / "configuracoes.json"
+    )
+
+Os parênteses servem apenas para quebrar a expressão em várias linhas,
+deixando o código mais legível.
+
+------------------------------------------------------------------------
+
+3. parents
+
+Considerando:
+
+    Projeto/
+    └── core/
+        └── config.py
+
+Temos:
+
+    Path(__file__).resolve().parents[0]
+
+Retorna:
+
+    Projeto/core
+
+Já:
+
+    .parents[1]
+
+Retorna:
+
+    Projeto
+
+Como o diretório core está diretamente dentro da raiz do projeto,
+usa-se:
+
+    RAIZ_PROJETO = Path(__file__).resolve().parents[1]
+
+------------------------------------------------------------------------
+
+4. O que significa ->
+
+Exemplo:
+
+    def carregar_configuracoes() -> dict[str, Any]:
+
+A seta indica o tipo que a função pretende retornar.
+
+Ela não altera o funcionamento da função.
+
+------------------------------------------------------------------------
+
+5. dict[str, Any]
+
+Significa:
+
+-   dict → dicionário.
+-   str → as chaves do dicionário são textos.
+-   Any → os valores podem ser de qualquer tipo.
+
+O JSON é convertido automaticamente em um dicionário pelo Python quando
+usamos:
+
+    json.load(arquivo)
+
+------------------------------------------------------------------------
+
+6. Por que o JSON vira um dicionário?
+
+JSON e dicionário possuem estruturas muito parecidas.
+
+JSON:
+
+    {
+      "pastas": {
+        "entrada": "data/entrada"
+      }
+    }
+
+Python:
+
+    {
+        "pastas": {
+            "entrada": "data/entrada"
+        }
+    }
+
+Isso permite acessar facilmente:
+
+    configuracoes["pastas"]["entrada"]
+
+------------------------------------------------------------------------
+
+7. raise
+
+raise significa lançar um erro.
+
+Exemplo:
+
+    raise FileNotFoundError("Arquivo não encontrado.")
+
+Quando executado, a função é interrompida e o erro é informado.
+
+------------------------------------------------------------------------
+
+8. FileNotFoundError
+
+Erro utilizado quando um arquivo esperado não existe.
+
+Exemplo:
+
+    if not caminho.exists():
+        raise FileNotFoundError(...)
+
+------------------------------------------------------------------------
+
+9. json.JSONDecodeError
+
+Ocorre quando o arquivo JSON possui erro de sintaxe.
+
+Exemplo:
+
+-   vírgula sobrando;
+-   aspas ausentes;
+-   chaves mal fechadas.
+
+------------------------------------------------------------------------
+
+10. ValueError
+
+Indica que um valor encontrado é inválido.
+
+No projeto foi utilizado para informar que o conteúdo do JSON é
+inválido.
+
+------------------------------------------------------------------------
+
+11. KeyError
+
+Indica que uma chave não existe em um dicionário.
+
+Exemplo:
+
+    pessoa = {
+        "nome": "Rodrigo"
+    }
+
+    pessoa["idade"]
+
+Resultado:
+
+    KeyError
+
+No projeto:
+
+    raise KeyError(
+        "Arquivo não configurado."
+    )
+
+------------------------------------------------------------------------
+
+12. Caminhos no projeto
+
+A função obter_caminho_arquivo() recebe um identificador:
+
+    obter_caminho_arquivo("entrada")
+
+Depois:
+
+1.  procura a pasta correspondente;
+2.  procura o nome do arquivo;
+3.  junta tudo com a raiz do projeto.
+
+Resultado:
+
+    Projeto/data/entrada/COMPLICACAO JUNHO.xlsx
+
+------------------------------------------------------------------------
+
+13. Organização adotada
+
+Decisão do projeto:
+
+-   Os nomes das chaves (entrada, destino, auditoria) permanecerão
+    fixos.
+-   Apenas os valores (caminhos) serão alterados no JSON quando
+    necessário.
+
+Assim, normalmente não será preciso alterar o código Python.
+
+------------------------------------------------------------------------
+
+14. Aprendizado importante
+
+Antes eu imaginava que o código deveria conhecer os caminhos.
+
+Agora entendi que:
+
+-   o JSON guarda as configurações;
+-   o Python lê essas configurações;
+-   o restante do projeto utiliza essas informações sem conhecer os
+    caminhos reais.
+
+Essa separação torna a manutenção mais simples e reduz alterações no
+código.

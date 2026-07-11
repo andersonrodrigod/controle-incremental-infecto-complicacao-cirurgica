@@ -1,0 +1,179 @@
+{
+  "pastas": {
+    "entrada": "data/entrada",
+    "destino": "data/destino",
+    "auditoria": "data/auditoria",
+    "backups": "backups",
+    "logs": "logs"
+  },
+
+  "arquivos": {
+    "entrada": {
+      "nome": "COMPLICACAO JUNHO.xlsx",
+      "aba": "BASE"
+    },
+
+    "destino_p1": {
+      "nome": "CONTROLE INFECTOLOGIA.xlsx",
+      "aba": "BASE"
+    },
+
+    "destino_rp1": {
+      "nome": "CONTROLE INFECTOLOGIA_RP1.xlsx",
+      "aba": "BASE"
+    },
+
+    "auditoria": {
+      "nome": "auditoria_execucoes.xlsx",
+      "aba": "BASE"
+    },
+
+    "log": {
+      "nome": "execucoes.log"
+    }
+  },
+
+  "logging": {
+    "nivel": "INFO"
+  },
+
+  "colunas_obrigatorias": [
+    "FILIAL",
+    "BASE",
+    "SIGLA",
+    "COD FILIAL",
+    "ESTADO",
+    "SENHA",
+    "COMPLICACAO",
+    "OBITO",
+    "COD USUARIO",
+    "USUARIO",
+    "DT ENVIO",
+    "DIARIAS",
+    "UTI",
+    "OBSERVACAO",
+    "DATA DE ENVIO",
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "OBSERVACAO DO CLIENTE",
+    "ESPECIALISTA",
+    "CONTATO RP1",
+    "DATA CONTATO RP1",
+    "OBSERVACAO DO CLIENTE RP1",
+    "RP1",
+    "RP1 Nº",
+    "LIGACAO EFETIVADA",
+    "TIPO",
+    "UF",
+    "DISTRITO",
+    "TELEFONE 1",
+    "TELEFONE 2",
+    "TELEFONE 3",
+    "TELEFONE 4",
+    "TELEFONE 5"
+  ],
+
+  "colunas_destino": {
+    "p1": [
+      "FILIAL",
+      "BASE",
+      "SIGLA",
+      "COD FILIAL",
+      "ESTADO",
+      "SENHA",
+      "COMPLICACAO",
+      "OBITO",
+      "COD USUARIO",
+      "USUARIO",
+      "DT ENVIO",
+      "DIARIAS",
+      "UTI",
+      "OBSERVACAO",
+      "DATA DE ENVIO",
+      "P1",
+      "P2",
+      "ESPECIALISTA",
+      "LIGACAO EFETIVADA",
+      "TIPO",
+      "UF",
+      "DISTRITO",
+      "TELEFONE 1",
+      "TELEFONE 2",
+      "TELEFONE 3",
+      "TELEFONE 4",
+      "TELEFONE 5"
+    ],
+
+    "rp1": [
+      "FILIAL",
+      "BASE",
+      "SIGLA",
+      "COD FILIAL",
+      "ESTADO",
+      "SENHA",
+      "COMPLICACAO",
+      "OBITO",
+      "COD USUARIO",
+      "USUARIO",
+      "DT ENVIO",
+      "DIARIAS",
+      "UTI",
+      "OBSERVACAO",
+      "DATA DE ENVIO",
+      "P1",
+      "P2",
+      "P3",
+      "P4",
+      "ESPECIALISTA",
+      "CONTATO RP1",
+      "DATA CONTATO RP1",
+      "OBSERVACAO DO CLIENTE RP1",
+      "RP1",
+      "RP1 Nº",
+      "LIGACAO EFETIVADA",
+      "TIPO",
+      "UF",
+      "DISTRITO",
+      "TELEFONE 1",
+      "TELEFONE 2",
+      "TELEFONE 3",
+      "TELEFONE 4",
+      "TELEFONE 5"
+    ]
+  },
+
+  "regras_processamento": {
+    "p1": {
+      "coluna": "P1",
+      "valores_aceitos": [
+        "Sim",
+        "Não"
+      ]
+    },
+
+    "rp1": {
+      "coluna": "RP1 Nº",
+      "valor_minimo": 1,
+      "valor_maximo": 5
+    }
+  },
+
+  "renomear_colunas": {
+    "p1": {
+      "P1": "Você percebeu caroço no corte da cirurgia?",
+      "P2": "Apresentou secreção com pus no corte da cirurgia?",
+      "P3": "Você recebeu orientações claras sobre os cuidados após a cirurgia?",
+      "P4": "Em relação à sua experiência, qual nota você daria em uma escala de 0 a 10?"
+    },
+
+    "rp1": {
+      "P1": "Você percebeu caroço no corte da cirurgia?",
+      "P2": "Apresentou secreção com pus no corte da cirurgia?",
+      "P3": "Você recebeu orientações claras sobre os cuidados após a cirurgia?",
+      "P4": "Em relação à sua experiência, qual nota você daria em uma escala de 0 a 10?",
+      "RP1 Nº": "1. Você percebeu caroço no corte da cirurgia? 60 dias"
+    }
+  }
+}
