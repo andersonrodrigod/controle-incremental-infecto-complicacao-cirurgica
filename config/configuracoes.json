@@ -37,6 +37,11 @@
     "nivel": "INFO"
   },
 
+  "colunas_manuais": {
+    "p1": [],
+    "rp1": []
+  },
+
   "colunas_obrigatorias": [
     "FILIAL",
     "BASE",

@@ -1,11 +1,16 @@
 import logging
+from typing import Any
 
 import pandas as pd
 
 from core.caminhos import obter_caminho_arquivo, obter_caminho_pasta
 from core.config import carregar_configuracoes
+from services.auditoria import registrar_auditoria_execucao
 from services.backup import criar_backup_arquivo, gerar_timestamp_backup
-from services.historico import identificar_registros_novos
+from services.historico import (
+    identificar_registros_novos,
+    mesclar_com_historico_preservando_colunas_manuais
+)
 from services.leitura import ler_excel
 from services.processamento import (
     filtrar_registros_p1,
@@ -23,7 +28,7 @@ from services.escrita import salvar_excel
 logger = logging.getLogger(__name__)
 
 
-def executar_pipeline() -> None:
+def executar_pipeline() -> dict[str, Any]:
     logger.info("Iniciando execucao do pipeline...")
 
     # 1. Carregamento das configurações
@@ -165,14 +170,24 @@ def executar_pipeline() -> None:
         novos_rp1.shape[0]
     )
 
-    dados_finais_p1 = pd.concat(
-        [historico_p1, novos_p1],
-        ignore_index=True
+    dados_finais_p1 = mesclar_com_historico_preservando_colunas_manuais(
+        dados_atuais=dados_p1,
+        dados_historico=historico_p1,
+        coluna_chave="SENHA",
+        colunas_manuais=configuracoes.get(
+            "colunas_manuais",
+            {}
+        ).get("p1", [])
     )
 
-    dados_finais_rp1 = pd.concat(
-        [historico_rp1, novos_rp1],
-        ignore_index=True
+    dados_finais_rp1 = mesclar_com_historico_preservando_colunas_manuais(
+        dados_atuais=dados_rp1,
+        dados_historico=historico_rp1,
+        coluna_chave="SENHA",
+        colunas_manuais=configuracoes.get(
+            "colunas_manuais",
+            {}
+        ).get("rp1", [])
     )
 
     dados_finais_p1 = dados_finais_p1.rename(
@@ -217,3 +232,27 @@ def executar_pipeline() -> None:
 
     logger.info("Processamento incremental concluido.")
     logger.info("Execucao do pipeline finalizada.")
+
+    resumo_execucao = {
+        "status": "SUCESSO",
+        "arquivo_entrada": caminho_entrada.name,
+        "aba_entrada": configuracao_entrada["aba"],
+        "linhas_lidas": dados.shape[0],
+        "colunas_lidas": dados.shape[1],
+        "registros_p1": dados_p1.shape[0],
+        "novos_p1": novos_p1.shape[0],
+        "registros_rp1": dados_rp1.shape[0],
+        "novos_rp1": novos_rp1.shape[0],
+        "linhas_finais_p1": dados_finais_p1.shape[0],
+        "linhas_finais_rp1": dados_finais_rp1.shape[0],
+        "backup_p1": backup_p1.name if backup_p1 is not None else "",
+        "backup_rp1": backup_rp1.name if backup_rp1 is not None else "",
+        "mensagem_erro": ""
+    }
+
+    try:
+        registrar_auditoria_execucao(resumo_execucao)
+    except Exception:
+        logger.exception("Nao foi possivel registrar auditoria de sucesso.")
+
+    return resumo_execucao
