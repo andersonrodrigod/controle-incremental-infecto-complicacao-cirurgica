@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from core.caminhos import (
+    obter_caminho_base,
     obter_caminho_arquivo,
     obter_caminho_log,
     obter_caminho_pasta,
@@ -14,7 +15,7 @@ def test_pastas_configuradas_existem_no_workspace():
     for nome_pasta in configuracoes["pastas"]:
         caminho = obter_caminho_pasta(nome_pasta)
 
-        assert caminho == RAIZ_PROJETO / configuracoes["pastas"][nome_pasta]
+        assert caminho == obter_caminho_base() / configuracoes["pastas"][nome_pasta]
         assert caminho.exists()
         assert caminho.is_dir()
 
@@ -63,11 +64,21 @@ def test_colunas_destino_estao_contidas_nas_colunas_obrigatorias():
         assert set(colunas_destino).issubset(colunas_obrigatorias)
 
 
-def test_configuracao_nao_aponta_para_caminhos_absolutos():
+def test_pastas_configuradas_continuam_relativas_ao_caminho_base():
     configuracoes = carregar_configuracoes()
 
     for caminho_relativo in configuracoes["pastas"].values():
         assert not Path(caminho_relativo).is_absolute()
+
+
+def test_caminho_base_configurado_resolve_para_raiz_operacional():
+    configuracoes = carregar_configuracoes()
+    caminho_base = Path(configuracoes["caminho_base"])
+
+    if caminho_base.is_absolute():
+        assert obter_caminho_base() == caminho_base
+    else:
+        assert obter_caminho_base() == RAIZ_PROJETO / caminho_base
 
 
 def test_caminho_log_usa_pasta_e_arquivo_configurados_no_json():
@@ -76,7 +87,7 @@ def test_caminho_log_usa_pasta_e_arquivo_configurados_no_json():
     caminho_log = obter_caminho_log()
 
     assert caminho_log == (
-        RAIZ_PROJETO
+        obter_caminho_base()
         / configuracoes["pastas"]["logs"]
         / configuracoes["arquivos"]["log"]["nome"]
     )

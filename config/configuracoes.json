@@ -1,4 +1,6 @@
 {
+  "caminho_base": ".",
+
   "pastas": {
     "entrada": "data/entrada",
     "destino": "data/destino",

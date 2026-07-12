@@ -7,6 +7,21 @@ from core.config import carregar_configuracoes
 RAIZ_PROJETO = Path(__file__).resolve().parents[1]
 
 
+def obter_caminho_base() -> Path:
+    configuracoes = carregar_configuracoes()
+    caminho_configurado = configuracoes.get("caminho_base")
+
+    if not caminho_configurado:
+        return RAIZ_PROJETO
+
+    caminho_base = Path(caminho_configurado)
+
+    if caminho_base.is_absolute():
+        return caminho_base
+
+    return RAIZ_PROJETO / caminho_base
+
+
 def obter_caminho_pasta(nome_pasta: str) -> Path:
     configuracoes = carregar_configuracoes()
     pastas = configuracoes["pastas"]
@@ -16,7 +31,7 @@ def obter_caminho_pasta(nome_pasta: str) -> Path:
             f"Pasta não configurada: {nome_pasta}"
         )
 
-    return RAIZ_PROJETO / pastas[nome_pasta]
+    return obter_caminho_base() / pastas[nome_pasta]
 
 
 def obter_caminho_arquivo(
@@ -58,7 +73,7 @@ def obter_caminho_arquivo(
     nome_arquivo = arquivos[nome_arquivo_configurado]["nome"]
 
     return (
-        RAIZ_PROJETO
+        obter_caminho_base()
         / caminho_relativo_pasta
         / nome_arquivo
     )
@@ -76,7 +91,7 @@ def obter_caminho_log() -> Path:
         raise KeyError("Arquivo nao configurado: log")
 
     return (
-        RAIZ_PROJETO
+        obter_caminho_base()
         / pastas["logs"]
         / arquivos["log"]["nome"]
     )
