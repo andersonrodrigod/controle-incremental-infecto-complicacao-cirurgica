@@ -7,10 +7,7 @@ from core.config import carregar_configuracoes
 RAIZ_PROJETO = Path(__file__).resolve().parents[1]
 
 
-def obter_caminho_base() -> Path:
-    configuracoes = carregar_configuracoes()
-    caminho_configurado = configuracoes.get("caminho_base")
-
+def resolver_caminho_base(caminho_configurado: str | None) -> Path:
     if not caminho_configurado:
         return RAIZ_PROJETO
 
@@ -22,76 +19,58 @@ def obter_caminho_base() -> Path:
     return RAIZ_PROJETO / caminho_base
 
 
-def obter_caminho_pasta(nome_pasta: str) -> Path:
-    configuracoes = carregar_configuracoes()
-    pastas = configuracoes["pastas"]
-
-    if nome_pasta not in pastas:
-        raise KeyError(
-            f"Pasta não configurada: {nome_pasta}"
-        )
-
-    return obter_caminho_base() / pastas[nome_pasta]
-
-
-def obter_caminho_arquivo(
-    nome_arquivo_configurado: str
+def obter_caminho_fluxo(
+    nome_fluxo: str,
+    tipo_caminho: str
 ) -> Path:
     configuracoes = carregar_configuracoes()
+    fluxos: dict[str, Any] = configuracoes["fluxos"]
 
-    arquivos: dict[str, Any] = configuracoes["arquivos"]
-    pastas: dict[str, str] = configuracoes["pastas"]
+    if nome_fluxo not in fluxos:
+        raise KeyError(f"Fluxo nao configurado: {nome_fluxo}")
 
-    mapa_pastas = {
-        "entrada": "entrada",
-        "destino_p1": "destino",
-        "destino_rp1": "destino",
-        "auditoria": "auditoria"
-    }
+    fluxo = fluxos[nome_fluxo]
 
-    if nome_arquivo_configurado not in arquivos:
+    if tipo_caminho not in fluxo:
         raise KeyError(
-            f"Arquivo não configurado: "
-            f"{nome_arquivo_configurado}"
+            f"Caminho nao configurado no fluxo {nome_fluxo}: "
+            f"{tipo_caminho}"
         )
 
-    if nome_arquivo_configurado not in mapa_pastas:
-        raise KeyError(
-            f"Não existe pasta associada ao arquivo: "
-            f"{nome_arquivo_configurado}"
-        )
-
-    chave_pasta = mapa_pastas[nome_arquivo_configurado]
-
-    if chave_pasta not in pastas:
-        raise KeyError(
-            f"Pasta não configurada: "
-            f"{chave_pasta}"
-        )
-
-    caminho_relativo_pasta = pastas[chave_pasta]
-    nome_arquivo = arquivos[nome_arquivo_configurado]["nome"]
+    configuracao_caminho = fluxo[tipo_caminho]
 
     return (
-        obter_caminho_base()
-        / caminho_relativo_pasta
-        / nome_arquivo
+        resolver_caminho_base(
+            configuracao_caminho.get("caminho_base")
+        )
+        / configuracao_caminho.get("pasta", "")
+        / configuracao_caminho["nome"]
     )
 
 
-def obter_caminho_log() -> Path:
+def obter_caminho_pasta_fluxo(
+    nome_fluxo: str,
+    tipo_caminho: str
+) -> Path:
     configuracoes = carregar_configuracoes()
-    pastas = configuracoes["pastas"]
-    arquivos = configuracoes["arquivos"]
+    fluxos: dict[str, Any] = configuracoes["fluxos"]
 
-    if "logs" not in pastas:
-        raise KeyError("Pasta nao configurada: logs")
+    if nome_fluxo not in fluxos:
+        raise KeyError(f"Fluxo nao configurado: {nome_fluxo}")
 
-    if "log" not in arquivos:
-        raise KeyError("Arquivo nao configurado: log")
+    fluxo = fluxos[nome_fluxo]
+
+    if tipo_caminho not in fluxo:
+        raise KeyError(
+            f"Pasta nao configurada no fluxo {nome_fluxo}: "
+            f"{tipo_caminho}"
+        )
+
+    configuracao_caminho = fluxo[tipo_caminho]
 
     return (
-        obter_caminho_base()
-        / pastas["logs"]
-        / arquivos["log"]["nome"]
+        resolver_caminho_base(
+            configuracao_caminho.get("caminho_base")
+        )
+        / configuracao_caminho.get("pasta", "")
     )

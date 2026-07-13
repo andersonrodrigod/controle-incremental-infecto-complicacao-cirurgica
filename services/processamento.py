@@ -1,30 +1,41 @@
 import pandas as pd
 
 
-def filtrar_registros_p1(
-    dados: pd.DataFrame,
-    coluna: str,
-    valores_aceitos: list[str]
-) -> pd.DataFrame:
-    """
-    Mantém somente os registros em que P1 possui
-    um dos valores aceitos.
-    """
-
-    valores_normalizados = {
-        str(valor).strip().casefold()
-        for valor in valores_aceitos
-    }
-
-    coluna_normalizada = (
-        dados[coluna]
+def _normalizar_texto(serie: pd.Series) -> pd.Series:
+    return (
+        serie
         .astype("string")
         .str.strip()
         .str.casefold()
     )
 
+
+def _criar_mascara_criterios_texto(
+    dados: pd.DataFrame,
+    criterios: dict[str, str]
+) -> pd.Series:
+    mascara = pd.Series(True, index=dados.index)
+
+    for coluna, valor_esperado in criterios.items():
+        valor_normalizado = str(valor_esperado).strip().casefold()
+        mascara = mascara & (
+            _normalizar_texto(dados[coluna]) == valor_normalizado
+        )
+
+    return mascara
+
+
+def filtrar_registros_p1(
+    dados: pd.DataFrame,
+    criterios: dict[str, str]
+) -> pd.DataFrame:
+    """
+    Mantem somente os registros que atendem aos
+    criterios textuais configurados para o destino P1.
+    """
+
     resultado = dados.loc[
-        coluna_normalizada.isin(valores_normalizados)
+        _criar_mascara_criterios_texto(dados, criterios)
     ].copy()
 
     return resultado
@@ -34,11 +45,13 @@ def filtrar_registros_rp1(
     dados: pd.DataFrame,
     coluna: str,
     valor_minimo: int,
-    valor_maximo: int
+    valor_maximo: int,
+    criterios: dict[str, str] | None = None
 ) -> pd.DataFrame:
     """
-    Mantém somente os registros em que RP1 Nº possui
-    um valor numérico entre o mínimo e o máximo.
+    Mantem somente os registros em que RP1 No possui
+    um valor numerico entre o minimo e o maximo e
+    atende aos criterios textuais configurados.
     """
 
     valores_numericos = pd.to_numeric(
@@ -46,13 +59,19 @@ def filtrar_registros_rp1(
         errors="coerce"
     )
 
-    resultado = dados.loc[
-        valores_numericos.between(
-            valor_minimo,
-            valor_maximo,
-            inclusive="both"
+    mascara = valores_numericos.between(
+        valor_minimo,
+        valor_maximo,
+        inclusive="both"
+    )
+
+    if criterios:
+        mascara = mascara & _criar_mascara_criterios_texto(
+            dados=dados,
+            criterios=criterios
         )
-    ].copy()
+
+    resultado = dados.loc[mascara].copy()
 
     return resultado
 
@@ -62,11 +81,63 @@ def selecionar_colunas_destino(
     colunas_destino: list[str]
 ) -> pd.DataFrame:
     """
-    Seleciona e organiza as colunas que serão enviadas
+    Seleciona e organiza as colunas que serao enviadas
     ao arquivo de destino.
     """
 
     return dados.loc[:, colunas_destino].copy()
+
+
+def _normalizar_valor_mapa(valor: object) -> str | None:
+    if pd.isna(valor): #type: ignore
+        return None
+
+    valor_texto = str(valor).strip()
+
+    try:
+        valor_numerico = float(valor_texto)
+    except ValueError:
+        return valor_texto
+
+    if valor_numerico.is_integer():
+        return str(int(valor_numerico))
+
+    return valor_texto
+
+
+def mapear_valores_colunas(
+    dados: pd.DataFrame,
+    mapas_valores: dict[str, dict[str, str | dict[str, str]]]
+) -> pd.DataFrame:
+    """
+    Troca valores tecnicos por textos finais configurados,
+    preservando valores que nao estejam no mapa.
+    """
+
+    resultado = dados.copy()
+
+    for coluna_destino, configuracao_mapa in mapas_valores.items():
+        if (
+            "origem" in configuracao_mapa
+            and "valores" in configuracao_mapa
+        ):
+            coluna_origem = str(configuracao_mapa["origem"])
+            mapa = configuracao_mapa["valores"]
+        else:
+            coluna_origem = coluna_destino
+            mapa = configuracao_mapa
+
+        if coluna_origem not in resultado.columns:
+            continue
+
+        resultado[coluna_destino] = resultado[coluna_origem].map(
+            lambda valor: mapa.get( #type: ignore
+                _normalizar_valor_mapa(valor), #type: ignore
+                valor
+            ) 
+        )
+
+    return resultado
 
 
 def renomear_colunas_destino(
@@ -74,8 +145,8 @@ def renomear_colunas_destino(
     mapa_renomeacao: dict[str, str]
 ) -> pd.DataFrame:
     """
-    Troca os nomes técnicos pelos nomes finais que
-    aparecerão no Excel.
+    Troca os nomes tecnicos pelos nomes finais que
+    aparecerao no Excel.
     """
 
     return dados.rename(

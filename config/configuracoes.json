@@ -1,186 +1,90 @@
 {
-  "caminho_base": ".",
-
-  "pastas": {
-    "entrada": "data/entrada",
-    "destino": "data/destino",
-    "auditoria": "data/auditoria",
-    "backups": "backups",
-    "logs": "logs"
-  },
-
-  "arquivos": {
-    "entrada": {
-      "nome": "COMPLICACAO JUNHO.xlsx",
-      "aba": "BASE"
+  "estrutura_criacao": {
+    "caminho_base": "C:/Users/anderson.dossantos/OneDrive - HAPVIDA ASSISTÊNCIA MÉDICA LTDA/Complicações Cirúrgicas/2026/MAIO",
+    "pasta": "data",
+    "arquivos": {
+      "controle_30_dias": {
+        "nome": "2026 MAIO PESQUISA DE COMPLICACAO INF - 30 DIAS.xlsx",
+        "aba": "BASE",
+        "colunas_destino": "p1"
+      },
+      "controle_60_dias": {
+        "nome": "2026 MAIO PESQUISA DE COMPLICACAO INF - 60 DIAS.xlsx",
+        "aba": "BASE",
+        "colunas_destino": "rp1"
+      },
+      "auditoria": {
+        "nome": "auditoria_execucoes.xlsx",
+        "aba": "BASE"
+      }
     },
-
-    "destino_p1": {
-      "nome": "CONTROLE INFECTOLOGIA.xlsx",
-      "aba": "BASE"
-    },
-
-    "destino_rp1": {
-      "nome": "CONTROLE INFECTOLOGIA_RP1.xlsx",
-      "aba": "BASE"
-    },
-
-    "auditoria": {
-      "nome": "auditoria_execucoes.xlsx",
-      "aba": "BASE"
-    },
-
-    "log": {
-      "nome": "execucoes.log"
+    "pastas": {
+      "backups_30_dias": "backups/30_dias",
+      "backups_60_dias": "backups/60_dias",
+      "logs": "logs"
     }
   },
-
+  "fluxos": {
+    "p1": {
+      "entrada": {
+        "caminho_base": "C:/Users/anderson.dossantos/OneDrive - HAPVIDA ASSISTÊNCIA MÉDICA LTDA/Complicações Cirúrgicas/2026/JUNHO",
+        "pasta": "",
+        "nome": "COMPLICACAO JUNHO.xlsx",
+        "aba": "BASE"
+      },
+      "destino": {
+        "caminho_base": "C:/Users/anderson.dossantos/OneDrive - HAPVIDA ASSISTÊNCIA MÉDICA LTDA/Complicações Cirúrgicas/2026/JUNHO",
+        "pasta": "data",
+        "nome": "2026 JUNHO PESQUISA DE COMPLICACAO INF - 30 DIAS.xlsx",
+        "aba": "BASE"
+      },
+      "auditoria": {
+        "caminho_base": "C:/Users/anderson.dossantos/OneDrive - HAPVIDA ASSISTÊNCIA MÉDICA LTDA/Complicações Cirúrgicas/2026/JUNHO",
+        "pasta": "data",
+        "nome": "auditoria_execucoes_p1.xlsx",
+        "aba": "BASE"
+      },
+      "backups": {
+        "caminho_base": "C:/Users/anderson.dossantos/OneDrive - HAPVIDA ASSISTÊNCIA MÉDICA LTDA/Complicações Cirúrgicas/2026/JUNHO",
+        "pasta": "data/backups/p1"
+      },
+      "log": {
+        "caminho_base": "C:/Users/anderson.dossantos/OneDrive - HAPVIDA ASSISTÊNCIA MÉDICA LTDA/Complicações Cirúrgicas/2026/JUNHO",
+        "pasta": "data/logs",
+        "nome": "execucoes_p1.log"
+      }
+    },
+    "rp1": {
+      "entrada": {
+        "caminho_base": "C:/Users/anderson.dossantos/OneDrive - HAPVIDA ASSISTÊNCIA MÉDICA LTDA/Complicações Cirúrgicas/2026/MAIO",
+        "pasta": "",
+        "nome": "COMPLICACAO MAIO.xlsx",
+        "aba": "BASE"
+      },
+      "destino": {
+        "caminho_base": "C:/Users/anderson.dossantos/OneDrive - HAPVIDA ASSISTÊNCIA MÉDICA LTDA/Complicações Cirúrgicas/2026/MAIO",
+        "pasta": "data",
+        "nome": "2026 MAIO PESQUISA DE COMPLICACAO INF - 60 DIAS.xlsx",
+        "aba": "BASE"
+      },
+      "auditoria": {
+        "caminho_base": "C:/Users/anderson.dossantos/OneDrive - HAPVIDA ASSISTÊNCIA MÉDICA LTDA/Complicações Cirúrgicas/2026/MAIO",
+        "pasta": "data",
+        "nome": "auditoria_execucoes_rp1.xlsx",
+        "aba": "BASE"
+      },
+      "backups": {
+        "caminho_base": "C:/Users/anderson.dossantos/OneDrive - HAPVIDA ASSISTÊNCIA MÉDICA LTDA/Complicações Cirúrgicas/2026/MAIO",
+        "pasta": "data/backups/rp1"
+      },
+      "log": {
+        "caminho_base": "C:/Users/anderson.dossantos/OneDrive - HAPVIDA ASSISTÊNCIA MÉDICA LTDA/Complicações Cirúrgicas/2026/MAIO",
+        "pasta": "data/logs",
+        "nome": "execucoes_rp1.log"
+      }
+    }
+  },
   "logging": {
     "nivel": "INFO"
-  },
-
-  "colunas_manuais": {
-    "p1": [],
-    "rp1": []
-  },
-
-  "colunas_obrigatorias": [
-    "FILIAL",
-    "BASE",
-    "SIGLA",
-    "COD FILIAL",
-    "ESTADO",
-    "SENHA",
-    "COMPLICACAO",
-    "OBITO",
-    "COD USUARIO",
-    "USUARIO",
-    "DT ENVIO",
-    "DIARIAS",
-    "UTI",
-    "OBSERVACAO",
-    "DATA DE ENVIO",
-    "P1",
-    "P2",
-    "P3",
-    "P4",
-    "OBSERVACAO DO CLIENTE",
-    "ESPECIALISTA",
-    "CONTATO RP1",
-    "DATA CONTATO RP1",
-    "OBSERVACAO DO CLIENTE RP1",
-    "RP1",
-    "RP1 Nº",
-    "LIGACAO EFETIVADA",
-    "TIPO",
-    "UF",
-    "DISTRITO",
-    "TELEFONE 1",
-    "TELEFONE 2",
-    "TELEFONE 3",
-    "TELEFONE 4",
-    "TELEFONE 5"
-  ],
-
-  "colunas_destino": {
-    "p1": [
-      "FILIAL",
-      "BASE",
-      "SIGLA",
-      "COD FILIAL",
-      "ESTADO",
-      "SENHA",
-      "COMPLICACAO",
-      "OBITO",
-      "COD USUARIO",
-      "USUARIO",
-      "DT ENVIO",
-      "DIARIAS",
-      "UTI",
-      "OBSERVACAO",
-      "DATA DE ENVIO",
-      "P1",
-      "P2",
-      "ESPECIALISTA",
-      "LIGACAO EFETIVADA",
-      "TIPO",
-      "UF",
-      "DISTRITO",
-      "TELEFONE 1",
-      "TELEFONE 2",
-      "TELEFONE 3",
-      "TELEFONE 4",
-      "TELEFONE 5"
-    ],
-
-    "rp1": [
-      "FILIAL",
-      "BASE",
-      "SIGLA",
-      "COD FILIAL",
-      "ESTADO",
-      "SENHA",
-      "COMPLICACAO",
-      "OBITO",
-      "COD USUARIO",
-      "USUARIO",
-      "DT ENVIO",
-      "DIARIAS",
-      "UTI",
-      "OBSERVACAO",
-      "DATA DE ENVIO",
-      "P1",
-      "P2",
-      "P3",
-      "P4",
-      "ESPECIALISTA",
-      "CONTATO RP1",
-      "DATA CONTATO RP1",
-      "OBSERVACAO DO CLIENTE RP1",
-      "RP1",
-      "RP1 Nº",
-      "LIGACAO EFETIVADA",
-      "TIPO",
-      "UF",
-      "DISTRITO",
-      "TELEFONE 1",
-      "TELEFONE 2",
-      "TELEFONE 3",
-      "TELEFONE 4",
-      "TELEFONE 5"
-    ]
-  },
-
-  "regras_processamento": {
-    "p1": {
-      "coluna": "P1",
-      "valores_aceitos": [
-        "Sim",
-        "Não"
-      ]
-    },
-
-    "rp1": {
-      "coluna": "RP1 Nº",
-      "valor_minimo": 1,
-      "valor_maximo": 5
-    }
-  },
-
-  "renomear_colunas": {
-    "p1": {
-      "P1": "Você percebeu caroço no corte da cirurgia?",
-      "P2": "Apresentou secreção com pus no corte da cirurgia?",
-      "P3": "Você recebeu orientações claras sobre os cuidados após a cirurgia?",
-      "P4": "Em relação à sua experiência, qual nota você daria em uma escala de 0 a 10?"
-    },
-
-    "rp1": {
-      "P1": "Você percebeu caroço no corte da cirurgia?",
-      "P2": "Apresentou secreção com pus no corte da cirurgia?",
-      "P3": "Você recebeu orientações claras sobre os cuidados após a cirurgia?",
-      "P4": "Em relação à sua experiência, qual nota você daria em uma escala de 0 a 10?",
-      "RP1 Nº": "1. Você percebeu caroço no corte da cirurgia? 60 dias"
-    }
   }
 }

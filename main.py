@@ -17,12 +17,15 @@ def main() -> None:
         logger.exception("Execucao falhou: %s", erro)
 
         try:
-            registrar_auditoria_execucao(
-                {
-                    "status": "FALHA",
-                    "mensagem_erro": str(erro)
-                }
-            )
+            for nome_fluxo in ("p1", "rp1"):
+                registrar_auditoria_execucao(
+                    {
+                        "fluxo": nome_fluxo,
+                        "status": "FALHA",
+                        "mensagem_erro": str(erro)
+                    },
+                    nome_fluxo=nome_fluxo
+                )
         except Exception:
             logger.exception("Nao foi possivel registrar auditoria de falha.")
 

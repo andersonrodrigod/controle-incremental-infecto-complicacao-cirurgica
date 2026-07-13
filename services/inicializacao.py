@@ -3,22 +3,29 @@ from typing import Any
 
 import pandas as pd
 
-from core.caminhos import obter_caminho_arquivo, obter_caminho_pasta
+from core.caminhos import (
+    obter_caminho_fluxo,
+    resolver_caminho_base,
+)
 from core.config import carregar_configuracoes
 
 
-# Execucao mensal manual:
-# 1. Ajuste "caminho_base" em config/configuracoes.json para a pasta do mes.
-# 2. Execute no terminal, a partir da raiz do projeto:
-#    python -m services.inicializacao
-
 COLUNAS_AUDITORIA = [
     "data_hora",
+    "fluxo",
     "status",
     "arquivo_entrada",
     "aba_entrada",
     "linhas_lidas",
     "colunas_lidas",
+    "arquivo_entrada_p1",
+    "aba_entrada_p1",
+    "linhas_lidas_p1",
+    "colunas_lidas_p1",
+    "arquivo_entrada_rp1",
+    "aba_entrada_rp1",
+    "linhas_lidas_rp1",
+    "colunas_lidas_rp1",
     "registros_p1",
     "novos_p1",
     "registros_rp1",
@@ -57,8 +64,22 @@ def preparar_estrutura_operacional() -> dict[str, Any]:
     arquivos_criados = []
     arquivos_existentes = []
 
-    for nome_pasta in configuracoes["pastas"]:
-        caminho_pasta = obter_caminho_pasta(nome_pasta)
+    estrutura_criacao = configuracoes["estrutura_criacao"]
+    caminho_base_criacao = resolver_caminho_base(
+        estrutura_criacao["caminho_base"]
+    )
+    caminho_pasta_principal = (
+        caminho_base_criacao / estrutura_criacao.get("pasta", "")
+    )
+    existia = caminho_pasta_principal.exists()
+
+    caminho_pasta_principal.mkdir(parents=True, exist_ok=True)
+
+    if not existia:
+        pastas_criadas.append(str(caminho_pasta_principal))
+
+    for caminho_relativo in estrutura_criacao.get("pastas", {}).values():
+        caminho_pasta = caminho_pasta_principal / caminho_relativo
         existia = caminho_pasta.exists()
 
         caminho_pasta.mkdir(parents=True, exist_ok=True)
@@ -66,15 +87,23 @@ def preparar_estrutura_operacional() -> dict[str, Any]:
         if not existia:
             pastas_criadas.append(str(caminho_pasta))
 
-    arquivos_para_criar = {
-        "destino_p1": configuracoes["colunas_destino"]["p1"],
-        "destino_rp1": configuracoes["colunas_destino"]["rp1"],
-        "auditoria": COLUNAS_AUDITORIA,
-    }
+    arquivos_para_criar = []
 
-    for nome_arquivo, colunas in arquivos_para_criar.items():
-        configuracao_arquivo = configuracoes["arquivos"][nome_arquivo]
-        caminho_arquivo = obter_caminho_arquivo(nome_arquivo)
+    for configuracao_arquivo in estrutura_criacao["arquivos"].values():
+        caminho_arquivo = (
+            caminho_pasta_principal / configuracao_arquivo["nome"]
+        )
+        chave_colunas = configuracao_arquivo.get("colunas_destino")
+        colunas = (
+            configuracoes["colunas_destino"][chave_colunas]
+            if chave_colunas
+            else COLUNAS_AUDITORIA
+        )
+        arquivos_para_criar.append(
+            (configuracao_arquivo, caminho_arquivo, colunas)
+        )
+
+    for configuracao_arquivo, caminho_arquivo, colunas in arquivos_para_criar:
 
         criado = _criar_excel_se_nao_existir(
             caminho=caminho_arquivo,
@@ -87,14 +116,19 @@ def preparar_estrutura_operacional() -> dict[str, Any]:
         else:
             arquivos_existentes.append(str(caminho_arquivo))
 
-    caminho_entrada = obter_caminho_arquivo("entrada")
+    caminho_entrada_p1 = obter_caminho_fluxo("p1", "entrada")
+    caminho_entrada_rp1 = obter_caminho_fluxo("rp1", "entrada")
 
     return {
         "pastas_criadas": pastas_criadas,
         "arquivos_criados": arquivos_criados,
         "arquivos_existentes": arquivos_existentes,
-        "arquivo_entrada_esperado": str(caminho_entrada),
-        "arquivo_entrada_existe": caminho_entrada.exists(),
+        "arquivo_entrada_esperado": str(caminho_entrada_p1),
+        "arquivo_entrada_existe": caminho_entrada_p1.exists(),
+        "arquivo_entrada_p1_esperado": str(caminho_entrada_p1),
+        "arquivo_entrada_p1_existe": caminho_entrada_p1.exists(),
+        "arquivo_entrada_rp1_esperado": str(caminho_entrada_rp1),
+        "arquivo_entrada_rp1_existe": caminho_entrada_rp1.exists(),
     }
 
 

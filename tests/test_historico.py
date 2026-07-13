@@ -1,9 +1,12 @@
+import warnings
+
 import pandas as pd
 
 from services.historico import (
     identificar_registros_novos,
     mesclar_com_historico_preservando_colunas_manuais,
 )
+from services.tipagem import aplicar_schema_colunas
 
 
 def test_identificar_registros_novos_remove_senhas_ja_existentes():
@@ -143,3 +146,71 @@ def test_mesclar_com_historico_mantem_registros_antigos_fora_da_entrada():
     )
 
     assert resultado["SENHA"].tolist() == ["100", "101"]
+
+
+def test_mesclar_com_historico_atualiza_existente_no_lugar_e_append_novo():
+    dados_atuais = pd.DataFrame(
+        {
+            "SENHA": ["100", "101", "102"],
+            "USUARIO": ["Maria atualizada", "Joao atualizado", "Ana"],
+            "DATA DE ENVIO": ["", "", ""],
+        }
+    )
+    dados_historico = pd.DataFrame(
+        {
+            "SENHA": ["100", "101"],
+            "USUARIO": ["Maria antiga", "Joao antigo"],
+            "DATA DE ENVIO": ["", "eu"],
+        }
+    )
+
+    resultado = mesclar_com_historico_preservando_colunas_manuais(
+        dados_atuais=dados_atuais,
+        dados_historico=dados_historico,
+        coluna_chave="SENHA",
+        colunas_manuais=["DATA DE ENVIO"],
+    )
+
+    assert resultado["SENHA"].tolist() == ["100", "101", "102"]
+    assert resultado["USUARIO"].tolist() == [
+        "Maria atualizada",
+        "Joao atualizado",
+        "Ana",
+    ]
+    assert resultado.loc[1, "DATA DE ENVIO"] == "eu"
+
+
+def test_mesclar_com_historico_aceita_mistura_de_numero_e_texto_sem_warning():
+    dados_atuais = pd.DataFrame(
+        {
+            "SENHA": ["100"],
+            "TELEFONE 1": ["5585992493600"],
+        }
+    )
+    dados_historico = pd.DataFrame(
+        {
+            "SENHA": ["100"],
+            "TELEFONE 1": [5585992493600],
+        }
+    )
+    schema_colunas = {
+        "texto": ["SENHA", "TELEFONE 1"],
+    }
+    dados_atuais = aplicar_schema_colunas(
+        dados=dados_atuais,
+        schema_colunas=schema_colunas,
+    )
+    dados_historico = aplicar_schema_colunas(
+        dados=dados_historico,
+        schema_colunas=schema_colunas,
+    )
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", FutureWarning)
+        resultado = mesclar_com_historico_preservando_colunas_manuais(
+            dados_atuais=dados_atuais,
+            dados_historico=dados_historico,
+            coluna_chave="SENHA",
+        )
+
+    assert resultado.loc[0, "TELEFONE 1"] == "5585992493600"

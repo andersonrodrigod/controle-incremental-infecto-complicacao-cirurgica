@@ -84,9 +84,28 @@ def mesclar_com_historico_preservando_colunas_manuais(
         historico[coluna_chave]
     )
 
+    dados_atuais_unicos = dados_atualizados.drop_duplicates(
+        subset=["_chave_incremental"],
+        keep="last"
+    )
     historico_unico = historico.drop_duplicates(
         subset=["_chave_incremental"],
         keep="last"
+    )
+
+    colunas_resultado = list(
+        dict.fromkeys(
+            [
+                coluna
+                for coluna in dados_atualizados.columns
+                if coluna != "_chave_incremental"
+            ]
+            + [
+                coluna
+                for coluna in historico.columns
+                if coluna != "_chave_incremental"
+            ]
+        )
     )
 
     for coluna in colunas_preservadas:
@@ -107,17 +126,42 @@ def mesclar_com_historico_preservando_colunas_manuais(
             valores_preservados
         )
 
-    chaves_atuais = set(dados_atualizados["_chave_incremental"])
-    historico_fora_da_entrada = historico.loc[
-        ~historico["_chave_incremental"].isin(chaves_atuais)
+    historico_atualizado = historico.copy()
+    valores_atuais_por_chave = dados_atuais_unicos.set_index(
+        "_chave_incremental"
+    )
+    chaves_historico = set(historico["_chave_incremental"])
+
+    for indice, linha_historico in historico.iterrows():
+        chave = linha_historico["_chave_incremental"]
+
+        if chave not in valores_atuais_por_chave.index:
+            continue
+
+        linha_atual = valores_atuais_por_chave.loc[chave]
+
+        for coluna in colunas_resultado:
+            if coluna in colunas_preservadas:
+                valor_historico = linha_historico.get(coluna, pd.NA)
+                if not pd.isna(valor_historico):
+                    historico_atualizado.loc[indice, coluna] = valor_historico
+                    continue
+
+            if coluna in linha_atual.index:
+                historico_atualizado.loc[indice, coluna] = linha_atual[coluna]
+
+    registros_novos = dados_atualizados.loc[
+        ~dados_atualizados["_chave_incremental"].isin(chaves_historico)
     ].copy()
 
     resultado = pd.concat(
-        [historico_fora_da_entrada, dados_atualizados],
+        [historico_atualizado, registros_novos],
         ignore_index=True
     )
 
-    return resultado.drop(
+    resultado = resultado.drop(
         columns=["_chave_incremental"],
         errors="ignore"
     )
+
+    return resultado.loc[:, colunas_resultado]

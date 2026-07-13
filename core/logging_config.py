@@ -1,7 +1,7 @@
 import logging
 from logging import Logger
 
-from core.caminhos import obter_caminho_log
+from core.caminhos import obter_caminho_fluxo
 from core.config import carregar_configuracoes
 
 
@@ -21,23 +21,34 @@ def configurar_logging() -> Logger:
         logging.INFO
     )
 
-    caminho_log = obter_caminho_log()
-    caminho_log.parent.mkdir(
-        parents=True,
-        exist_ok=True
-    )
+    caminhos_log = []
+
+    for nome_fluxo in configuracoes.get("fluxos", {}):
+        fluxo = configuracoes["fluxos"][nome_fluxo]
+        if "log" in fluxo:
+            caminhos_log.append(obter_caminho_fluxo(nome_fluxo, "log"))
+
+    handlers = []
+
+    for caminho_log in dict.fromkeys(caminhos_log):
+        caminho_log.parent.mkdir(
+            parents=True,
+            exist_ok=True
+        )
+        handlers.append(
+            logging.FileHandler(
+                caminho_log,
+                encoding="utf-8"
+            )
+        )
+
+    handlers.append(logging.StreamHandler())
 
     logging.basicConfig(
         level=nivel,
         format=FORMATO_LOG,
         datefmt=FORMATO_DATA_LOG,
-        handlers=[
-            logging.FileHandler(
-                caminho_log,
-                encoding="utf-8"
-            ),
-            logging.StreamHandler()
-        ],
+        handlers=handlers,
         force=True
     )
 
