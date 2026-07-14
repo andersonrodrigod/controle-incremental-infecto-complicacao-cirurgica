@@ -104,12 +104,17 @@ def test_carregar_configuracoes_mescla_esquemas_operacionais():
         assert chave in configuracoes
 
 
-def test_colunas_destino_estao_contidas_nas_colunas_obrigatorias():
+def test_coluna_auditoria_medica_esta_na_posicao_configurada():
     configuracoes = carregar_configuracoes()
-    colunas_obrigatorias = set(configuracoes["colunas_obrigatorias"])
+    colunas_p1 = configuracoes["colunas_destino"]["p1"]
+    colunas_rp1 = configuracoes["colunas_destino"]["rp1"]
 
-    for colunas_destino in configuracoes["colunas_destino"].values():
-        assert set(colunas_destino).issubset(colunas_obrigatorias)
+    assert colunas_p1.index("AUDITORIA MEDICA") == (
+        colunas_p1.index("P1") + 1
+    )
+    assert colunas_rp1.index("AUDITORIA MEDICA") == (
+        colunas_rp1.index("RP1") + 1
+    )
 
 
 def test_resolver_caminho_base_relativo_usa_raiz_do_projeto():

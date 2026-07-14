@@ -56,12 +56,26 @@ def mesclar_com_historico_preservando_colunas_manuais(
     dados_atuais: pd.DataFrame,
     dados_historico: pd.DataFrame,
     coluna_chave: str,
-    colunas_manuais: list[str] | None = None
+    colunas_manuais: list[str] | None = None,
+    coluna_data_envio: str | None = None,
+    data_envio: str | None = None
 ) -> pd.DataFrame:
     if dados_historico.empty:
-        return dados_atuais.copy()
+        resultado = dados_atuais.copy()
+        return _preencher_data_envio_registros_novos(
+            dados=resultado,
+            indice_registros_novos=resultado.index,
+            coluna_data_envio=coluna_data_envio,
+            data_envio=data_envio,
+        )
 
-    colunas_manuais_configuradas = colunas_manuais or []
+    colunas_manuais_configuradas = list(colunas_manuais or [])
+
+    if (
+        coluna_data_envio
+        and coluna_data_envio not in colunas_manuais_configuradas
+    ):
+        colunas_manuais_configuradas.append(coluna_data_envio)
     colunas_extras_historico = [
         coluna
         for coluna in dados_historico.columns
@@ -108,6 +122,9 @@ def mesclar_com_historico_preservando_colunas_manuais(
         )
     )
 
+    if coluna_data_envio and coluna_data_envio not in colunas_resultado:
+        colunas_resultado.append(coluna_data_envio)
+
     for coluna in colunas_preservadas:
         if coluna not in dados_atualizados.columns:
             dados_atualizados[coluna] = pd.NA
@@ -153,6 +170,12 @@ def mesclar_com_historico_preservando_colunas_manuais(
     registros_novos = dados_atualizados.loc[
         ~dados_atualizados["_chave_incremental"].isin(chaves_historico)
     ].copy()
+    registros_novos = _preencher_data_envio_registros_novos(
+        dados=registros_novos,
+        indice_registros_novos=registros_novos.index,
+        coluna_data_envio=coluna_data_envio,
+        data_envio=data_envio,
+    )
 
     resultado = pd.concat(
         [historico_atualizado, registros_novos],
@@ -165,3 +188,22 @@ def mesclar_com_historico_preservando_colunas_manuais(
     )
 
     return resultado.loc[:, colunas_resultado]
+
+
+def _preencher_data_envio_registros_novos(
+    dados: pd.DataFrame,
+    indice_registros_novos: pd.Index,
+    coluna_data_envio: str | None,
+    data_envio: str | None,
+) -> pd.DataFrame:
+    if not coluna_data_envio or not data_envio:
+        return dados
+
+    resultado = dados.copy()
+
+    if coluna_data_envio not in resultado.columns:
+        resultado[coluna_data_envio] = pd.NA
+
+    resultado.loc[indice_registros_novos, coluna_data_envio] = str(data_envio)
+
+    return resultado

@@ -85,7 +85,13 @@ def selecionar_colunas_destino(
     ao arquivo de destino.
     """
 
-    return dados.loc[:, colunas_destino].copy()
+    resultado = dados.copy()
+
+    for coluna in colunas_destino:
+        if coluna not in resultado.columns:
+            resultado[coluna] = ""
+
+    return resultado.loc[:, colunas_destino].copy()
 
 
 def _normalizar_valor_mapa(valor: object) -> str | None:

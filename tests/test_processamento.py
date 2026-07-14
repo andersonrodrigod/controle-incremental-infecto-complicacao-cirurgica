@@ -92,6 +92,27 @@ def test_selecionar_colunas_destino_preserva_ordem_configurada():
     }
 
 
+def test_selecionar_colunas_destino_cria_colunas_ausentes_vazias():
+    dados = pd.DataFrame(
+        {
+            "SENHA": ["100"],
+            "P1": ["Sim"],
+        }
+    )
+
+    resultado = selecionar_colunas_destino(
+        dados=dados,
+        colunas_destino=["SENHA", "P1", "AUDITORIA MEDICA"],
+    )
+
+    assert resultado.columns.tolist() == [
+        "SENHA",
+        "P1",
+        "AUDITORIA MEDICA",
+    ]
+    assert resultado.loc[0, "AUDITORIA MEDICA"] == ""
+
+
 def test_mapear_valores_colunas_cria_rp1_texto_preservando_rp1_numero():
     dados = pd.DataFrame(
         {

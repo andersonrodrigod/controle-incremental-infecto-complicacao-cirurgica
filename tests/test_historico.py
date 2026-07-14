@@ -180,6 +180,66 @@ def test_mesclar_com_historico_atualiza_existente_no_lugar_e_append_novo():
     assert resultado.loc[1, "DATA DE ENVIO"] == "eu"
 
 
+def test_mesclar_com_historico_preenche_data_envio_texto_em_registros_novos():
+    dados_atuais = pd.DataFrame(
+        {
+            "SENHA": ["100", "101"],
+            "USUARIO": ["Maria atualizada", "Joao"],
+            "DATA ENVIO": ["", "valor anterior"],
+        }
+    )
+    dados_historico = pd.DataFrame(
+        {
+            "SENHA": ["100"],
+            "USUARIO": ["Maria antiga"],
+            "DATA ENVIO": ["13/07/2026"],
+        }
+    )
+
+    resultado = mesclar_com_historico_preservando_colunas_manuais(
+        dados_atuais=dados_atuais,
+        dados_historico=dados_historico,
+        coluna_chave="SENHA",
+        coluna_data_envio="DATA ENVIO",
+        data_envio="14/07/2026",
+    )
+
+    linha_existente = resultado.loc[resultado["SENHA"] == "100"].iloc[0]
+    linha_nova = resultado.loc[resultado["SENHA"] == "101"].iloc[0]
+
+    assert linha_existente["DATA ENVIO"] == "13/07/2026"
+    assert linha_nova["DATA ENVIO"] == "14/07/2026"
+    assert isinstance(linha_nova["DATA ENVIO"], str)
+
+
+def test_mesclar_com_historico_cria_data_envio_quando_coluna_nao_existe():
+    dados_atuais = pd.DataFrame(
+        {
+            "SENHA": ["101"],
+            "USUARIO": ["Joao"],
+        }
+    )
+    dados_historico = pd.DataFrame(
+        {
+            "SENHA": ["100"],
+            "USUARIO": ["Maria"],
+        }
+    )
+
+    resultado = mesclar_com_historico_preservando_colunas_manuais(
+        dados_atuais=dados_atuais,
+        dados_historico=dados_historico,
+        coluna_chave="SENHA",
+        coluna_data_envio="DATA ENVIO",
+        data_envio="14/07/2026",
+    )
+
+    linha_nova = resultado.loc[resultado["SENHA"] == "101"].iloc[0]
+
+    assert "DATA ENVIO" in resultado.columns
+    assert linha_nova["DATA ENVIO"] == "14/07/2026"
+
+
 def test_mesclar_com_historico_aceita_mistura_de_numero_e_texto_sem_warning():
     dados_atuais = pd.DataFrame(
         {
