@@ -185,14 +185,14 @@ def test_mesclar_com_historico_preenche_data_envio_texto_em_registros_novos():
         {
             "SENHA": ["100", "101"],
             "USUARIO": ["Maria atualizada", "Joao"],
-            "DATA ENVIO": ["", "valor anterior"],
+            "DATA DE ENVIO": ["", "valor anterior"],
         }
     )
     dados_historico = pd.DataFrame(
         {
             "SENHA": ["100"],
             "USUARIO": ["Maria antiga"],
-            "DATA ENVIO": ["13/07/2026"],
+            "DATA DE ENVIO": ["13/07/2026"],
         }
     )
 
@@ -200,16 +200,16 @@ def test_mesclar_com_historico_preenche_data_envio_texto_em_registros_novos():
         dados_atuais=dados_atuais,
         dados_historico=dados_historico,
         coluna_chave="SENHA",
-        coluna_data_envio="DATA ENVIO",
+        coluna_data_envio="DATA DE ENVIO",
         data_envio="14/07/2026",
     )
 
     linha_existente = resultado.loc[resultado["SENHA"] == "100"].iloc[0]
     linha_nova = resultado.loc[resultado["SENHA"] == "101"].iloc[0]
 
-    assert linha_existente["DATA ENVIO"] == "13/07/2026"
-    assert linha_nova["DATA ENVIO"] == "14/07/2026"
-    assert isinstance(linha_nova["DATA ENVIO"], str)
+    assert linha_existente["DATA DE ENVIO"] == "13/07/2026"
+    assert linha_nova["DATA DE ENVIO"] == "14/07/2026"
+    assert isinstance(linha_nova["DATA DE ENVIO"], str)
 
 
 def test_mesclar_com_historico_cria_data_envio_quando_coluna_nao_existe():
@@ -230,14 +230,15 @@ def test_mesclar_com_historico_cria_data_envio_quando_coluna_nao_existe():
         dados_atuais=dados_atuais,
         dados_historico=dados_historico,
         coluna_chave="SENHA",
-        coluna_data_envio="DATA ENVIO",
+        coluna_data_envio="DATA DE ENVIO",
         data_envio="14/07/2026",
     )
 
     linha_nova = resultado.loc[resultado["SENHA"] == "101"].iloc[0]
 
-    assert "DATA ENVIO" in resultado.columns
-    assert linha_nova["DATA ENVIO"] == "14/07/2026"
+    assert "DATA DE ENVIO" in resultado.columns
+    assert "DATA ENVIO" not in resultado.columns
+    assert linha_nova["DATA DE ENVIO"] == "14/07/2026"
 
 
 def test_mesclar_com_historico_aceita_mistura_de_numero_e_texto_sem_warning():
@@ -274,3 +275,37 @@ def test_mesclar_com_historico_aceita_mistura_de_numero_e_texto_sem_warning():
         )
 
     assert resultado.loc[0, "TELEFONE 1"] == "5585992493600"
+
+
+def test_mesclar_com_historico_nao_emite_futurewarning_com_vazio_em_coluna_numerica():
+    dados_atuais = pd.DataFrame(
+        {
+            "SENHA": ["100", "101"],
+            "RP1 NÂº": ["", ""],
+            "AUDITORIA MEDICA": ["", ""],
+            "DATA DE ENVIO": ["", ""],
+        }
+    )
+    dados_historico = pd.DataFrame(
+        {
+            "SENHA": ["100"],
+            "RP1 NÂº": [1.0],
+            "AUDITORIA MEDICA": [pd.NA],
+            "DATA DE ENVIO": ["13/07/2026"],
+        }
+    )
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", FutureWarning)
+        resultado = mesclar_com_historico_preservando_colunas_manuais(
+            dados_atuais=dados_atuais,
+            dados_historico=dados_historico,
+            coluna_chave="SENHA",
+            colunas_manuais=["AUDITORIA MEDICA"],
+            coluna_data_envio="DATA DE ENVIO",
+            data_envio="14/07/2026",
+        )
+
+    assert resultado["SENHA"].tolist() == ["100", "101"]
+    assert resultado.loc[0, "RP1 NÂº"] == ""
+    assert resultado.loc[1, "DATA DE ENVIO"] == "14/07/2026"

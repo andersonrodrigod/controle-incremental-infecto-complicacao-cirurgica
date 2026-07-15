@@ -1,6 +1,9 @@
 """Esquemas operacionais do processamento incremental."""
 
-COLUNAS_MANUAIS = {'p1': [], 'rp1': []}
+COLUNAS_MANUAIS = {
+    'p1': ['AUDITORIA MEDICA'],
+    'rp1': ['AUDITORIA MEDICA'],
+}
 
 COLUNAS_OBRIGATORIAS = [
     'FILIAL',
@@ -39,8 +42,8 @@ COLUNAS_DESTINO = {
         'PROCEDIMENTO',
         'DT INTERNACAO',
         'P1',
-        'AUDITORIA MEDICA',
         'P2',
+        'AUDITORIA MEDICA',
         'DT ENVIO',
         'ESTADO',
         'ESPECIALISTA',
@@ -107,7 +110,6 @@ SCHEMA_COLUNAS = {
         'DATA DO CONTATO',
         'LIDA',
         'STATUS',
-        'DATA ENVIO',
         'DATA DE ENVIO',
         'P1',
         'P2',

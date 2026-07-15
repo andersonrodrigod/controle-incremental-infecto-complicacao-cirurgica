@@ -165,7 +165,7 @@ def _executar_fluxo(
             nome_fluxo,
             [],
         ),
-        coluna_data_envio="DATA ENVIO",
+        coluna_data_envio="DATA DE ENVIO",
         data_envio=data_envio,
     )
     dados_finais = dados_finais.rename(
@@ -259,11 +259,35 @@ def _carregar_historico_fluxo(
         dados=historico,
         mapa_renomeacao=configuracoes["renomear_colunas"][nome_fluxo],
     )
+    historico = _normalizar_coluna_data_envio_historico(historico)
 
     return aplicar_schema_colunas(
         dados=historico,
         schema_colunas=configuracoes.get("schema_colunas"),
     )
+
+
+def _normalizar_coluna_data_envio_historico(
+    historico: pd.DataFrame,
+) -> pd.DataFrame:
+    if "DATA ENVIO" not in historico.columns:
+        return historico
+
+    resultado = historico.copy()
+
+    if "DATA DE ENVIO" not in resultado.columns:
+        resultado["DATA DE ENVIO"] = pd.NA
+
+    data_envio_legado = resultado["DATA ENVIO"].astype("string").str.strip()
+    data_de_envio = resultado["DATA DE ENVIO"].astype("string").str.strip()
+    linhas_para_recuperar = data_de_envio.isna() | data_de_envio.eq("")
+
+    resultado.loc[
+        linhas_para_recuperar,
+        "DATA DE ENVIO",
+    ] = data_envio_legado.loc[linhas_para_recuperar]
+
+    return resultado.drop(columns=["DATA ENVIO"])
 
 
 def _criar_resumo_execucao_base() -> dict[str, Any]:

@@ -110,11 +110,18 @@ def test_coluna_auditoria_medica_esta_na_posicao_configurada():
     colunas_rp1 = configuracoes["colunas_destino"]["rp1"]
 
     assert colunas_p1.index("AUDITORIA MEDICA") == (
-        colunas_p1.index("P1") + 1
+        colunas_p1.index("P2") + 1
     )
     assert colunas_rp1.index("AUDITORIA MEDICA") == (
         colunas_rp1.index("RP1") + 1
     )
+
+
+def test_auditoria_medica_e_coluna_manual_dos_fluxos():
+    configuracoes = carregar_configuracoes()
+
+    assert "AUDITORIA MEDICA" in configuracoes["colunas_manuais"]["p1"]
+    assert "AUDITORIA MEDICA" in configuracoes["colunas_manuais"]["rp1"]
 
 
 def test_resolver_caminho_base_relativo_usa_raiz_do_projeto():

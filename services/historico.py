@@ -88,8 +88,8 @@ def mesclar_com_historico_preservando_colunas_manuais(
         )
     )
 
-    dados_atualizados = dados_atuais.copy()
-    historico = dados_historico.copy()
+    dados_atualizados = dados_atuais.copy().astype("object")
+    historico = dados_historico.copy().astype("object")
 
     dados_atualizados["_chave_incremental"] = normalizar_chave_registro(
         dados_atualizados[coluna_chave]
@@ -177,14 +177,16 @@ def mesclar_com_historico_preservando_colunas_manuais(
         data_envio=data_envio,
     )
 
-    resultado = pd.concat(
-        [historico_atualizado, registros_novos],
-        ignore_index=True
-    )
+    historico_final = historico_atualizado.reindex(
+        columns=colunas_resultado
+    ).astype("object")
+    registros_novos_final = registros_novos.reindex(
+        columns=colunas_resultado
+    ).astype("object")
 
-    resultado = resultado.drop(
-        columns=["_chave_incremental"],
-        errors="ignore"
+    resultado = pd.concat(
+        [historico_final, registros_novos_final],
+        ignore_index=True
     )
 
     return resultado.loc[:, colunas_resultado]
@@ -204,6 +206,9 @@ def _preencher_data_envio_registros_novos(
     if coluna_data_envio not in resultado.columns:
         resultado[coluna_data_envio] = pd.NA
 
+    resultado[coluna_data_envio] = resultado[coluna_data_envio].astype(
+        "object"
+    )
     resultado.loc[indice_registros_novos, coluna_data_envio] = str(data_envio)
 
     return resultado
