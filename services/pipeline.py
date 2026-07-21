@@ -172,6 +172,8 @@ def _executar_fluxo(
         columns=configuracoes["renomear_colunas"][nome_fluxo]
     )
 
+    destino_existente = caminho_destino.exists()
+
     backup = criar_backup_arquivo(
         caminho_origem=caminho_destino,
         pasta_backups=caminho_backups,
@@ -185,6 +187,11 @@ def _executar_fluxo(
         dados=dados_finais,
         caminho_destino=caminho_destino,
         nome_aba=configuracao_destino["aba"],
+        dados_incrementais=(
+            dados_finais.tail(novos.shape[0])
+            if destino_existente
+            else None
+        ),
     )
 
     return {
