@@ -19,6 +19,7 @@ from services.historico import (
 )
 from services.leitura import ler_excel
 from services.processamento import (
+    filtrar_registros_opcoes_texto,
     filtrar_registros_p1,
     filtrar_registros_rp1,
     mapear_valores_colunas,
@@ -67,6 +68,7 @@ def executar_pipeline(
                 _criar_resumo_auditoria_fluxo(
                     resumo_execucao=resumo_execucao,
                     resumo_fluxo=resumo_fluxo,
+                    fluxos_configurados=configuracoes["fluxos"].keys(),
                 ),
                 nome_fluxo=nome_fluxo,
             )
@@ -214,34 +216,47 @@ def _filtrar_registros_fluxo(
 ) -> pd.DataFrame:
     regras_processamento = configuracoes["regras_processamento"]
 
-    if nome_fluxo == "p1":
-        regra_p1 = regras_processamento["p1"]
-        dados_fluxo = filtrar_registros_p1(
+    regra_fluxo = regras_processamento.get(nome_fluxo)
+
+    if regra_fluxo is None:
+        raise KeyError(f"Fluxo sem regra de processamento: {nome_fluxo}")
+
+    if "criterios_opcoes" in regra_fluxo:
+        dados_fluxo = filtrar_registros_opcoes_texto(
             dados=dados_entrada,
-            criterios=regra_p1["criterios"],
+            criterios_opcoes=regra_fluxo["criterios_opcoes"],
         )
         return selecionar_colunas_destino(
             dados=dados_fluxo,
-            colunas_destino=configuracoes["colunas_destino"]["p1"],
+            colunas_destino=configuracoes["colunas_destino"][nome_fluxo],
+        )
+
+    if "criterios" in regra_fluxo and "coluna" not in regra_fluxo:
+        dados_fluxo = filtrar_registros_p1(
+            dados=dados_entrada,
+            criterios=regra_fluxo["criterios"],
+        )
+        return selecionar_colunas_destino(
+            dados=dados_fluxo,
+            colunas_destino=configuracoes["colunas_destino"][nome_fluxo],
         )
 
     if nome_fluxo == "rp1":
-        regra_rp1 = regras_processamento["rp1"]
         dados_fluxo = filtrar_registros_rp1(
             dados=dados_entrada,
-            coluna=regra_rp1["coluna"],
-            valor_minimo=regra_rp1["valor_minimo"],
-            valor_maximo=regra_rp1["valor_maximo"],
-            criterios=regra_rp1["criterios"],
+            coluna=regra_fluxo["coluna"],
+            valor_minimo=regra_fluxo["valor_minimo"],
+            valor_maximo=regra_fluxo["valor_maximo"],
+            criterios=regra_fluxo["criterios"],
         )
         dados_fluxo = selecionar_colunas_destino(
             dados=dados_fluxo,
-            colunas_destino=configuracoes["colunas_destino"]["rp1"],
+            colunas_destino=configuracoes["colunas_destino"][nome_fluxo],
         )
         return mapear_valores_colunas(
             dados=dados_fluxo,
             mapas_valores=configuracoes.get("mapear_valores", {}).get(
-                "rp1",
+                nome_fluxo,
                 {},
             ),
         )
@@ -312,14 +327,22 @@ def _criar_resumo_execucao_base() -> dict[str, Any]:
         "aba_entrada_rp1": "",
         "linhas_lidas_rp1": 0,
         "colunas_lidas_rp1": 0,
+        "arquivo_entrada_p1_sciras": "",
+        "aba_entrada_p1_sciras": "",
+        "linhas_lidas_p1_sciras": 0,
+        "colunas_lidas_p1_sciras": 0,
         "registros_p1": 0,
         "novos_p1": 0,
         "registros_rp1": 0,
         "novos_rp1": 0,
+        "registros_p1_sciras": 0,
+        "novos_p1_sciras": 0,
         "linhas_finais_p1": 0,
         "linhas_finais_rp1": 0,
+        "linhas_finais_p1_sciras": 0,
         "backup_p1": "",
         "backup_rp1": "",
+        "backup_p1_sciras": "",
         "mensagem_erro": "",
     }
 
@@ -353,19 +376,25 @@ def _atualizar_resumo_execucao(
 def _criar_resumo_auditoria_fluxo(
     resumo_execucao: dict[str, Any],
     resumo_fluxo: dict[str, Any],
+    fluxos_configurados: Iterable[str],
 ) -> dict[str, Any]:
     nome_fluxo = resumo_fluxo["fluxo"]
-    outro_fluxo = "rp1" if nome_fluxo == "p1" else "p1"
-
-    return {
+    resumo_auditoria = {
         **resumo_execucao,
         "fluxo": nome_fluxo,
         "arquivo_entrada": resumo_fluxo["arquivo_entrada"],
         "aba_entrada": resumo_fluxo["aba_entrada"],
         "linhas_lidas": resumo_fluxo["linhas_lidas"],
         "colunas_lidas": resumo_fluxo["colunas_lidas"],
-        f"registros_{outro_fluxo}": 0,
-        f"novos_{outro_fluxo}": 0,
-        f"linhas_finais_{outro_fluxo}": 0,
-        f"backup_{outro_fluxo}": "",
     }
+
+    for fluxo in fluxos_configurados:
+        if fluxo == nome_fluxo:
+            continue
+
+        resumo_auditoria[f"registros_{fluxo}"] = 0
+        resumo_auditoria[f"novos_{fluxo}"] = 0
+        resumo_auditoria[f"linhas_finais_{fluxo}"] = 0
+        resumo_auditoria[f"backup_{fluxo}"] = ""
+
+    return resumo_auditoria

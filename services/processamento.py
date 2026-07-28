@@ -1,4 +1,14 @@
+import unicodedata
+
 import pandas as pd
+
+
+def _remover_acentos(texto: str) -> str:
+    return "".join(
+        caractere
+        for caractere in unicodedata.normalize("NFKD", texto)
+        if not unicodedata.combining(caractere)
+    )
 
 
 def _normalizar_texto(serie: pd.Series) -> pd.Series:
@@ -7,6 +17,7 @@ def _normalizar_texto(serie: pd.Series) -> pd.Series:
         .astype("string")
         .str.strip()
         .str.casefold()
+        .map(_remover_acentos, na_action="ignore")
     )
 
 
@@ -17,9 +28,29 @@ def _criar_mascara_criterios_texto(
     mascara = pd.Series(True, index=dados.index)
 
     for coluna, valor_esperado in criterios.items():
-        valor_normalizado = str(valor_esperado).strip().casefold()
+        valor_normalizado = _remover_acentos(
+            str(valor_esperado).strip().casefold()
+        )
         mascara = mascara & (
             _normalizar_texto(dados[coluna]) == valor_normalizado
+        )
+
+    return mascara
+
+
+def _criar_mascara_criterios_opcoes_texto(
+    dados: pd.DataFrame,
+    criterios_opcoes: dict[str, list[str]]
+) -> pd.Series:
+    mascara = pd.Series(True, index=dados.index)
+
+    for coluna, valores_esperados in criterios_opcoes.items():
+        valores_normalizados = {
+            _remover_acentos(str(valor).strip().casefold())
+            for valor in valores_esperados
+        }
+        mascara = mascara & (
+            _normalizar_texto(dados[coluna]).isin(valores_normalizados)
         )
 
     return mascara
@@ -36,6 +67,22 @@ def filtrar_registros_p1(
 
     resultado = dados.loc[
         _criar_mascara_criterios_texto(dados, criterios)
+    ].copy()
+
+    return resultado
+
+
+def filtrar_registros_opcoes_texto(
+    dados: pd.DataFrame,
+    criterios_opcoes: dict[str, list[str]]
+) -> pd.DataFrame:
+    """
+    Mantem registros em que as colunas configuradas possuem
+    um dos valores textuais esperados.
+    """
+
+    resultado = dados.loc[
+        _criar_mascara_criterios_opcoes_texto(dados, criterios_opcoes)
     ].copy()
 
     return resultado

@@ -2,6 +2,7 @@
 
 COLUNAS_MANUAIS = {
     'p1': ['AUDITORIA MEDICA'],
+    'p1_sciras': ['AUDITORIA MEDICA'],
     'rp1': ['AUDITORIA MEDICA'],
 }
 
@@ -163,6 +164,7 @@ SCHEMA_COLUNAS = {
 
 REGRAS_PROCESSAMENTO = {
     'p1': {'criterios': {'P1': 'Sim', 'P2': 'Sim'}},
+    'p1_sciras': {'criterios_opcoes': {'P1': ['Sim', 'Nao']}},
     'rp1': {'coluna': 'RP1 Nº', 'valor_minimo': 1, 'valor_maximo': 5, 'criterios': {'P1': 'Sim', 'TIPO': 'VIDEO ABDOMINAL'}}}
 
 MAPEAR_VALORES = {
@@ -200,6 +202,9 @@ RENOMEAR_COLUNAS = {
         'RP1': '1. Você percebeu caroço no corte da cirurgia? 60 dias'
     }
 }
+
+COLUNAS_DESTINO['p1_sciras'] = COLUNAS_DESTINO['p1'].copy()
+RENOMEAR_COLUNAS['p1_sciras'] = RENOMEAR_COLUNAS['p1'].copy()
 
 ESQUEMAS = {
     "colunas_manuais": COLUNAS_MANUAIS,

@@ -12,12 +12,12 @@ def main() -> None:
 
     logger.info("Iniciando controle incremental...")
     try:
-        executar_pipeline()
+        executar_pipeline(nomes_fluxos=("p1", "rp1", "p1_sciras"))
     except Exception as erro:
         logger.exception("Execucao falhou: %s", erro)
 
         try:
-            for nome_fluxo in ("p1", "rp1"):
+            for nome_fluxo in ("p1", "rp1", "p1_sciras"):
                 registrar_auditoria_execucao(
                     {
                         "fluxo": nome_fluxo,

@@ -12,7 +12,7 @@ from core.config import RAIZ_PROJETO, carregar_configuracoes
 def test_fluxos_configurados_resolvem_caminhos_operacionais():
     configuracoes = carregar_configuracoes()
 
-    for nome_fluxo in ("p1", "rp1"):
+    for nome_fluxo in ("p1", "p1_sciras", "rp1"):
         fluxo = configuracoes["fluxos"][nome_fluxo]
 
         for tipo_caminho in ("entrada", "destino", "auditoria", "log"):
@@ -29,7 +29,7 @@ def test_fluxos_configurados_resolvem_caminhos_operacionais():
 def test_fluxos_configurados_resolvem_pastas_de_backup():
     configuracoes = carregar_configuracoes()
 
-    for nome_fluxo in ("p1", "rp1"):
+    for nome_fluxo in ("p1", "p1_sciras", "rp1"):
         caminho = obter_caminho_pasta_fluxo(nome_fluxo, "backups")
         configuracao_caminho = configuracoes["fluxos"][nome_fluxo][
             "backups"
@@ -59,6 +59,7 @@ def test_estrutura_criacao_define_pasta_arquivos_e_subpastas():
     assert {
         "controle_30_dias",
         "controle_60_dias",
+        "controle_30_dias_sciras",
         "auditoria",
     }.issubset(estrutura["arquivos"])
 
@@ -107,10 +108,14 @@ def test_carregar_configuracoes_mescla_esquemas_operacionais():
 def test_coluna_auditoria_medica_esta_na_posicao_configurada():
     configuracoes = carregar_configuracoes()
     colunas_p1 = configuracoes["colunas_destino"]["p1"]
+    colunas_p1_sciras = configuracoes["colunas_destino"]["p1_sciras"]
     colunas_rp1 = configuracoes["colunas_destino"]["rp1"]
 
     assert colunas_p1.index("AUDITORIA MEDICA") == (
         colunas_p1.index("P2") + 1
+    )
+    assert colunas_p1_sciras.index("AUDITORIA MEDICA") == (
+        colunas_p1_sciras.index("P2") + 1
     )
     assert colunas_rp1.index("AUDITORIA MEDICA") == (
         colunas_rp1.index("RP1") + 1
@@ -121,6 +126,10 @@ def test_auditoria_medica_e_coluna_manual_dos_fluxos():
     configuracoes = carregar_configuracoes()
 
     assert "AUDITORIA MEDICA" in configuracoes["colunas_manuais"]["p1"]
+    assert (
+        "AUDITORIA MEDICA"
+        in configuracoes["colunas_manuais"]["p1_sciras"]
+    )
     assert "AUDITORIA MEDICA" in configuracoes["colunas_manuais"]["rp1"]
 
 

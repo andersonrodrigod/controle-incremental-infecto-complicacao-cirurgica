@@ -1,6 +1,7 @@
 import pandas as pd
 
 from services.processamento import (
+    filtrar_registros_opcoes_texto,
     filtrar_registros_p1,
     filtrar_registros_rp1,
     mapear_valores_colunas,
@@ -24,6 +25,22 @@ def test_filtrar_registros_p1_exige_p1_e_p2_sim():
     )
 
     assert resultado["SENHA"].tolist() == ["100", "104"]
+
+
+def test_filtrar_registros_opcoes_texto_aceita_p1_sim_e_nao():
+    dados = pd.DataFrame(
+        {
+            "SENHA": ["100", "101", "102", "103"],
+            "P1": ["Sim", "Nao", "Não", ""],
+        }
+    )
+
+    resultado = filtrar_registros_opcoes_texto(
+        dados=dados,
+        criterios_opcoes={"P1": ["Sim", "Nao"]},
+    )
+
+    assert resultado["SENHA"].tolist() == ["100", "101", "102"]
 
 
 def test_filtrar_registros_rp1_mantem_apenas_intervalo_configurado():

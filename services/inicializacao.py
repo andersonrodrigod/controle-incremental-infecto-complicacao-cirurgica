@@ -26,14 +26,22 @@ COLUNAS_AUDITORIA = [
     "aba_entrada_rp1",
     "linhas_lidas_rp1",
     "colunas_lidas_rp1",
+    "arquivo_entrada_p1_sciras",
+    "aba_entrada_p1_sciras",
+    "linhas_lidas_p1_sciras",
+    "colunas_lidas_p1_sciras",
     "registros_p1",
     "novos_p1",
     "registros_rp1",
     "novos_rp1",
+    "registros_p1_sciras",
+    "novos_p1_sciras",
     "linhas_finais_p1",
     "linhas_finais_rp1",
+    "linhas_finais_p1_sciras",
     "backup_p1",
     "backup_rp1",
+    "backup_p1_sciras",
     "mensagem_erro",
 ]
 
@@ -116,20 +124,32 @@ def preparar_estrutura_operacional() -> dict[str, Any]:
         else:
             arquivos_existentes.append(str(caminho_arquivo))
 
-    caminho_entrada_p1 = obter_caminho_fluxo("p1", "entrada")
-    caminho_entrada_rp1 = obter_caminho_fluxo("rp1", "entrada")
+    caminhos_entrada = {
+        nome_fluxo: obter_caminho_fluxo(nome_fluxo, "entrada")
+        for nome_fluxo in configuracoes["fluxos"]
+    }
+    caminho_entrada_padrao = (
+        caminhos_entrada.get("p1")
+        or next(iter(caminhos_entrada.values()))
+    )
 
-    return {
+    resumo = {
         "pastas_criadas": pastas_criadas,
         "arquivos_criados": arquivos_criados,
         "arquivos_existentes": arquivos_existentes,
-        "arquivo_entrada_esperado": str(caminho_entrada_p1),
-        "arquivo_entrada_existe": caminho_entrada_p1.exists(),
-        "arquivo_entrada_p1_esperado": str(caminho_entrada_p1),
-        "arquivo_entrada_p1_existe": caminho_entrada_p1.exists(),
-        "arquivo_entrada_rp1_esperado": str(caminho_entrada_rp1),
-        "arquivo_entrada_rp1_existe": caminho_entrada_rp1.exists(),
+        "arquivo_entrada_esperado": str(caminho_entrada_padrao),
+        "arquivo_entrada_existe": caminho_entrada_padrao.exists(),
     }
+
+    for nome_fluxo, caminho_entrada in caminhos_entrada.items():
+        resumo[f"arquivo_entrada_{nome_fluxo}_esperado"] = str(
+            caminho_entrada
+        )
+        resumo[f"arquivo_entrada_{nome_fluxo}_existe"] = (
+            caminho_entrada.exists()
+        )
+
+    return resumo
 
 
 if __name__ == "__main__":
