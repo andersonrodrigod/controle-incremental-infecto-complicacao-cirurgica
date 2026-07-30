@@ -1,32 +1,32 @@
 {
   "estrutura_criacao": {
-    "caminho_base": "C:/Users/anderson.dossantos/OneDrive - HAPVIDA ASSISTÊNCIA MÉDICA LTDA/Complicações Cirúrgicas/2026/MAIO",
-    "pasta": "data",
+    "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/JULHO",
+    "pasta": "",
     "arquivos": {
       "controle_30_dias": {
-        "nome": "2026 MAIO PESQUISA DE COMPLICACAO INF - 30 DIAS.xlsx",
+        "nome": "2026 JULHO PESQUISA DE COMPLICACAO INF - 30 DIAS.xlsx",
         "aba": "BASE",
         "colunas_destino": "p1"
       },
       "controle_60_dias": {
-        "nome": "2026 MAIO PESQUISA DE COMPLICACAO INF - 60 DIAS.xlsx",
+        "nome": "2026 JULHO PESQUISA DE COMPLICACAO INF - 60 DIAS.xlsx",
         "aba": "BASE",
         "colunas_destino": "rp1"
       },
       "controle_30_dias_sciras": {
-        "nome": "2026 JUNHO PESQUISA DE COMPLICACAO INF - 30 DIAS SCIRAS.xlsx",
+        "nome": "2026 JULHO PESQUISA DE COMPLICACAO INF - 30 DIAS SCIRAS.xlsx",
         "aba": "BASE",
         "colunas_destino": "p1_sciras"
       },
       "auditoria": {
-        "nome": "auditoria_execucoes.xlsx",
+        "nome": "DATA/auditoria_execucoes.xlsx",
         "aba": "BASE"
       }
     },
     "pastas": {
-      "backups_30_dias": "backups/30_dias",
-      "backups_60_dias": "backups/60_dias",
-      "logs": "logs"
+      "backups_30_dias": "DATA/backups/30_dias",
+      "backups_60_dias": "DATA/backups/60_dias",
+      "logs": "DATA/logs"
     }
   },
   "fluxos": {

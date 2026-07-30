@@ -28,7 +28,7 @@ def _carregar_json(caminho: Path) -> dict[str, Any]:
         )
 
     try:
-        with caminho.open(mode="r", encoding="utf-8") as arquivo:
+        with caminho.open(mode="r", encoding="utf-8-sig") as arquivo:
             return json.load(arquivo)
 
     except json.JSONDecodeError as erro:
