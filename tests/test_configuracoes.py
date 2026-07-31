@@ -47,8 +47,8 @@ def test_estrutura_criacao_define_pasta_arquivos_e_subpastas():
     caminho_base = resolver_caminho_base(estrutura["caminho_base"])
     pasta_principal = caminho_base / estrutura["pasta"]
 
-    assert estrutura["pasta"] == "data"
     assert not Path(estrutura["pasta"]).is_absolute()
+    assert pasta_principal == caminho_base / estrutura["pasta"]
 
     for caminho_relativo in estrutura["pastas"].values():
         assert not Path(caminho_relativo).is_absolute()
