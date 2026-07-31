@@ -41,27 +41,25 @@ def test_fluxos_configurados_resolvem_pastas_de_backup():
         )
 
 
-def test_estrutura_criacao_define_pasta_arquivos_e_subpastas():
+def test_estrutura_criacao_por_fluxos():
     configuracoes = carregar_configuracoes()
     estrutura = configuracoes["estrutura_criacao"]
-    caminho_base = resolver_caminho_base(estrutura["caminho_base"])
-    pasta_principal = caminho_base / estrutura["pasta"]
 
-    assert estrutura["pasta"] == "data"
-    assert not Path(estrutura["pasta"]).is_absolute()
+    assert estrutura["por_fluxos"] is True
 
-    for caminho_relativo in estrutura["pastas"].values():
-        assert not Path(caminho_relativo).is_absolute()
-        assert (pasta_principal / caminho_relativo).is_relative_to(
-            pasta_principal
-        )
 
-    assert {
-        "controle_30_dias",
-        "controle_60_dias",
-        "controle_30_dias_sciras",
-        "auditoria",
-    }.issubset(estrutura["arquivos"])
+def test_fluxos_configurados_usam_arvores_infecto_e_sciras():
+    configuracoes = carregar_configuracoes()
+    fluxos = configuracoes["fluxos"]
+
+    assert "INFECTO/2026/JUNHO" in fluxos["p1"]["destino"]["caminho_base"]
+    assert "INFECTO/2026/JUNHO" in fluxos["rp1"]["destino"]["caminho_base"]
+    assert (
+        "INFECTO SCIRAS/2026/JUNHO"
+        in fluxos["p1_sciras"]["destino"]["caminho_base"]
+    )
+    assert "INFECTO SCIRAS" not in fluxos["p1"]["destino"]["caminho_base"]
+    assert "INFECTO SCIRAS" not in fluxos["rp1"]["destino"]["caminho_base"]
 
 
 def test_configuracao_nao_usa_blocos_antigos_de_caminho():
