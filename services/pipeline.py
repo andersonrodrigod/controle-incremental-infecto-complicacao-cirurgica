@@ -159,6 +159,17 @@ def _executar_fluxo(
     )
     logger.info("Novos registros para %s: %s", rotulo_fluxo, novos.shape[0])
 
+    destino_existente = caminho_destino.exists()
+
+    backup = criar_backup_arquivo(
+        caminho_origem=caminho_destino,
+        pasta_backups=caminho_backups,
+        timestamp=timestamp_backup,
+    )
+
+    if backup is not None:
+        logger.info("Backup %s criado: %s", rotulo_fluxo, backup.name)
+
     dados_finais = mesclar_com_historico_preservando_colunas_manuais(
         dados_atuais=dados_fluxo,
         dados_historico=historico,
@@ -173,17 +184,6 @@ def _executar_fluxo(
     dados_finais = dados_finais.rename(
         columns=configuracoes["renomear_colunas"][nome_fluxo]
     )
-
-    destino_existente = caminho_destino.exists()
-
-    backup = criar_backup_arquivo(
-        caminho_origem=caminho_destino,
-        pasta_backups=caminho_backups,
-        timestamp=timestamp_backup,
-    )
-
-    if backup is not None:
-        logger.info("Backup %s criado: %s", rotulo_fluxo, backup.name)
 
     salvar_excel(
         dados=dados_finais,

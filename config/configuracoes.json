@@ -1,10 +1,10 @@
 {
   "estrutura_criacao": {
-    "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/INFECTO/2026/JUNHO",
+    "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/INFECTO/2026/JULHO",
     "pasta": "",
     "arquivos": {
       "controle_30_dias": {
-        "nome": "2026 JUNHO PESQUISA DE COMPLICACAO INF - 30 DIAS.xlsx",
+        "nome": "2026 JULHO PESQUISA DE COMPLICACAO INF - 30 DIAS.xlsx",
         "aba": "BASE",
         "colunas_destino": "p1"
       },
@@ -14,7 +14,7 @@
         "colunas_destino": "rp1"
       },
       "controle_30_dias_sciras": {
-        "nome": "2026 JUNHO PESQUISA DE COMPLICACAO INF - 30 DIAS SCIRAS.xlsx",
+        "nome": "2026 JULHO PESQUISA DE COMPLICACAO INF - 30 DIAS SCIRAS.xlsx",
         "aba": "BASE",
         "colunas_destino": "p1_sciras"
       },
@@ -32,58 +32,58 @@
   "fluxos": {
     "p1": {
       "entrada": {
-        "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/BASE/2026/JUNHO",
+        "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/BASE/2026/JULHO",
         "pasta": "",
-        "nome": "COMPLICACAO JUNHO.xlsx",
+        "nome": "COMPLICACAO JULHO.xlsx",
         "aba": "BASE"
       },
       "destino": {
-        "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/INFECTO/2026/JUNHO",
+        "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/INFECTO/2026/JULHO",
         "pasta": "",
-        "nome": "2026 JUNHO PESQUISA DE COMPLICACAO INF - 30 DIAS.xlsx",
+        "nome": "2026 JULHO PESQUISA DE COMPLICACAO INF - 30 DIAS.xlsx",
         "aba": "BASE"
       },
       "auditoria": {
-        "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/INFECTO/2026/JUNHO",
+        "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/INFECTO/2026/JULHO",
         "pasta": "DATA",
         "nome": "auditoria_execucoes_p1.xlsx",
         "aba": "BASE"
       },
       "backups": {
-        "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/INFECTO/2026/JUNHO",
+        "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/INFECTO/2026/JULHO",
         "pasta": "DATA/backups/p1"
       },
       "log": {
-        "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/INFECTO/2026/JUNHO",
+        "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/INFECTO/2026/JULHO",
         "pasta": "DATA/logs",
         "nome": "execucoes_p1.log"
       }
     },
     "p1_sciras": {
       "entrada": {
-        "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/BASE/2026/JUNHO",
+        "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/BASE/2026/JULHO",
         "pasta": "",
-        "nome": "COMPLICACAO JUNHO.xlsx",
+        "nome": "COMPLICACAO JULHO.xlsx",
         "aba": "BASE"
       },
       "destino": {
-        "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/INFECTO SCIRAS/2026/JUNHO",
+        "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/INFECTO SCIRAS/2026/JULHO",
         "pasta": "",
-        "nome": "2026 JUNHO PESQUISA DE COMPLICACAO INF - 30 DIAS SCIRAS.xlsx",
+        "nome": "2026 JULHO PESQUISA DE COMPLICACAO INF - 30 DIAS SCIRAS.xlsx",
         "aba": "BASE"
       },
       "auditoria": {
-        "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/INFECTO SCIRAS/2026/JUNHO",
+        "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/INFECTO SCIRAS/2026/JULHO",
         "pasta": "DATA",
         "nome": "auditoria_execucoes_p1_sciras.xlsx",
         "aba": "BASE"
       },
       "backups": {
-        "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/INFECTO SCIRAS/2026/JUNHO",
+        "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/INFECTO SCIRAS/2026/JULHO",
         "pasta": "DATA/backups/p1_sciras"
       },
       "log": {
-        "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/INFECTO SCIRAS/2026/JUNHO",
+        "caminho_base": "C:/Users/anderson.dossantos/HAPVIDA ASSISTÊNCIA MÉDICA LTDA/5 Estrelas - Documentos/Complicações Cirúrgicas/INFECTO SCIRAS/2026/JULHO",
         "pasta": "DATA/logs",
         "nome": "execucoes_p1_sciras.log"
       }

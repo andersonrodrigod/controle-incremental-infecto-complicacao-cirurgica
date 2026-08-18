@@ -1,6 +1,7 @@
 from copy import deepcopy
 
 import pandas as pd
+import pytest
 
 from core import caminhos
 from core.config import carregar_configuracoes as carregar_configuracoes_real
@@ -160,3 +161,55 @@ def test_pipeline_atualiza_copia_temporaria_sem_alterar_referencias(
     assert caminho_auditoria.exists()
     assert list(caminho_backups.glob("*.xlsx"))
 
+
+def test_pipeline_cria_backup_antes_de_falha_na_mesclagem(
+    monkeypatch,
+    tmp_path,
+):
+    configuracoes = _remapear_configuracao_para_tmp(tmp_path)
+    _aplicar_configuracoes(monkeypatch, configuracoes)
+    monkeypatch.setattr(
+        pipeline,
+        "gerar_timestamp_backup",
+        lambda: "20260818_074203",
+    )
+
+    caminho_entrada = caminhos.obter_caminho_fluxo("p1", "entrada")
+    caminho_destino = caminhos.obter_caminho_fluxo("p1", "destino")
+    caminho_backups = caminhos.obter_caminho_pasta_fluxo("p1", "backups")
+
+    caminho_entrada.parent.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(
+        [_linha_entrada(configuracoes, "101", "Joao novo")]
+    ).to_excel(caminho_entrada, sheet_name="BASE", index=False)
+
+    caminho_destino.parent.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(
+        [{"SENHA": "100", "USUARIO": "Maria historico"}]
+    ).to_excel(caminho_destino, sheet_name="BASE", index=False)
+
+    def falhar_mesclagem(*args, **kwargs):
+        raise RuntimeError("falha simulada depois do backup")
+
+    monkeypatch.setattr(
+        pipeline,
+        "mesclar_com_historico_preservando_colunas_manuais",
+        falhar_mesclagem,
+    )
+
+    with pytest.raises(RuntimeError, match="falha simulada"):
+        pipeline.executar_pipeline(nomes_fluxos=("p1",))
+
+    backup = (
+        caminho_backups
+        / f"{caminho_destino.stem}_20260818_074203.xlsx"
+    )
+    assert backup.exists()
+
+    historico = pd.read_excel(caminho_destino, sheet_name="BASE")
+    copia_backup = pd.read_excel(backup, sheet_name="BASE")
+
+    assert historico.to_dict("records") == [
+        {"SENHA": 100, "USUARIO": "Maria historico"},
+    ]
+    assert copia_backup.to_dict("records") == historico.to_dict("records")

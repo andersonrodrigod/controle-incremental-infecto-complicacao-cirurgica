@@ -176,3 +176,29 @@ def test_restaurar_nomes_tecnicos_reverte_colunas_renomeadas():
     )
 
     assert resultado.columns.tolist() == ["P1", "SENHA"]
+
+
+def test_restaurar_nomes_tecnicos_consolida_colunas_duplicadas():
+    dados = pd.DataFrame(
+        {
+            "P1": ["", "Sim"],
+            "Pergunta P1": ["Nao", "Sim"],
+            "RP1": ["texto tecnico", ""],
+            "Pergunta RP1": ["texto final", "texto final novo"],
+        }
+    )
+
+    resultado = restaurar_nomes_tecnicos(
+        dados=dados,
+        mapa_renomeacao={
+            "P1": "Pergunta P1",
+            "RP1": "Pergunta RP1",
+        },
+    )
+
+    assert resultado.columns.tolist() == ["P1", "RP1"]
+    assert resultado["P1"].tolist() == ["Nao", "Sim"]
+    assert resultado["RP1"].tolist() == [
+        "texto tecnico",
+        "texto final novo",
+    ]

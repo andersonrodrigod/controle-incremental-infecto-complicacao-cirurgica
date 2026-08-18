@@ -216,6 +216,28 @@ def restaurar_nomes_tecnicos(
         for nome_original, nome_final in mapa_renomeacao.items()
     }
 
-    return dados.rename(
+    resultado = dados.rename(
         columns=mapa_inverso
     )
+
+    return _consolidar_colunas_duplicadas(resultado)
+
+
+def _consolidar_colunas_duplicadas(dados: pd.DataFrame) -> pd.DataFrame:
+    if not dados.columns.has_duplicates:
+        return dados
+
+    colunas_unicas = list(dict.fromkeys(dados.columns))
+    resultado = pd.DataFrame(index=dados.index)
+
+    for coluna in colunas_unicas:
+        colunas_mesmo_nome = dados.loc[:, dados.columns == coluna]
+
+        if colunas_mesmo_nome.shape[1] == 1:
+            resultado[coluna] = colunas_mesmo_nome.iloc[:, 0]
+            continue
+
+        valores_normalizados = colunas_mesmo_nome.replace("", pd.NA)
+        resultado[coluna] = valores_normalizados.bfill(axis=1).iloc[:, 0]
+
+    return resultado
